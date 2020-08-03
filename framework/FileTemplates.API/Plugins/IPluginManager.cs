@@ -10,5 +10,9 @@ namespace FileTemplates.API.Plugins
     {
         IEnumerable<IPlugin> ActivatedPlugins { get; }
         Task ActivatePluginAsync(Assembly assembly);
+
+        Task LoadPluginsAsync(string directory);
+        Task UnloadPluginAsync(string name);
+        Task UnloadPluginsAsync();
     }
 }

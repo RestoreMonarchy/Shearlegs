@@ -12,10 +12,14 @@ namespace FileTemplates.Runtime
     {
         private ServiceCollection services;
 
+        public IPluginManager PluginManager { get; private set; }
+        public IPluginLibrariesManager PluginLibrariesManager { get; private set; }
+
         public async Task StartAsync()
         {
             services = new ServiceCollection();
             services.AddSingleton<IPluginManager, PluginManager>();
+            services.AddSingleton<IPluginLibrariesManager, PluginLibrariesManager>();
             services.AddTransient<ILogger, Logger>();
 
             await InitializeAsync(services.BuildServiceProvider());
@@ -23,12 +27,16 @@ namespace FileTemplates.Runtime
 
         public async Task InitializeAsync(IServiceProvider serviceProvider)
         {
-            serviceProvider.GetRequiredService<IPluginManager>();
+            PluginManager = serviceProvider.GetRequiredService<IPluginManager>();
+            PluginLibrariesManager = serviceProvider.GetRequiredService<IPluginLibrariesManager>();
+
+            await PluginLibrariesManager.LoadLibrariesAsync("Libraries");
+            await PluginManager.LoadPluginsAsync("Plugins");
         }
         
         public async Task StopAsync()
         {
-
+            await PluginManager.UnloadPluginsAsync();
         }
     }
 }
