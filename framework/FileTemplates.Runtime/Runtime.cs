@@ -3,7 +3,6 @@ using FileTemplates.API.Logging;
 using FileTemplates.API.Plugins;
 using FileTemplates.Core.Logging;
 using FileTemplates.Core.Plugins;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -16,10 +15,8 @@ namespace FileTemplates.Runtime
 
         public IPluginManager PluginManager { get; private set; }
         public IPluginLibrariesManager PluginLibrariesManager { get; private set; }
-        
-        public IServiceProvider ServiceProvider { get; private set; }
 
-        public async Task InitializeAsync()
+        public Task InitializeAsync()
         {
             Container = ConfigureContainer();
             Directory.CreateDirectory("Libraries");
@@ -27,6 +24,7 @@ namespace FileTemplates.Runtime
 
             PluginManager = Container.Resolve<IPluginManager>();
             PluginLibrariesManager = Container.Resolve<IPluginLibrariesManager>();
+            return Task.CompletedTask;
         }
 
         private IContainer ConfigureContainer()
@@ -47,7 +45,7 @@ namespace FileTemplates.Runtime
         
         public async Task StopAsync()
         {
-            await PluginManager.UnloadPluginsAsync();
+            await PluginManager.DeactivatePluginsAsync();
         }
     }
 }

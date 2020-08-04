@@ -17,6 +17,12 @@ namespace FileTemplates.Core.Plugins
         private readonly List<Assembly> loadedPlugins;
         private readonly List<IPlugin> activatedPlugins;
 
+        public event PluginActivated OnPluginActivated;
+        public event PluginDeactivated OnPluginDeactivated;
+
+        public IEnumerable<Assembly> LoadedPlugins => loadedPlugins;
+        public IEnumerable<IPlugin> ActivatedPlugins => activatedPlugins;
+
         public PluginManager(ILifetimeScope lifetimeScope)
         {
             this.lifetimeScope = lifetimeScope;
@@ -24,12 +30,7 @@ namespace FileTemplates.Core.Plugins
             activatedPlugins = new List<IPlugin>();
         }
 
-        public event PluginLoaded OnPluginLoaded;
-
-        public IEnumerable<Assembly> LoadedPlugins => loadedPlugins;
-        public IEnumerable<IPlugin> ActivatedPlugins => activatedPlugins;        
-
-        public Task<IPlugin> ActivatePluginAsync(Assembly assembly)
+        public async Task<IPlugin> ActivatePluginAsync(Assembly assembly)
         {
             var pluginType = assembly.GetTypes().FirstOrDefault(x => x.GetInterface(nameof(IPlugin)) != null);
 
@@ -43,8 +44,13 @@ namespace FileTemplates.Core.Plugins
                 pluginInstance = scope.Resolve(pluginType) as IPlugin;
             }
 
+            // TODO: add try-catch and log exception when calling plugin LoadAsync
+            await pluginInstance.LoadAsync();
+
             activatedPlugins.Add(pluginInstance);
-            return Task.FromResult(pluginInstance);
+
+            OnPluginActivated?.Invoke(pluginInstance);
+            return pluginInstance;
         }
 
         public async Task LoadPluginsAsync(string directory)
@@ -57,41 +63,30 @@ namespace FileTemplates.Core.Plugins
             }
         }
 
-        private async Task LoadPluginAsync(string fileFullName)
+        public async Task<IPlugin> LoadPluginAsync(string fileFullName)
         {
             var assembly = Assembly.LoadFile(fileFullName);
             loadedPlugins.Add(assembly);
-            OnPluginLoaded?.Invoke(await ActivatePluginAsync(assembly));
+            return await ActivatePluginAsync(assembly);
         }
 
-        public async Task<bool> TryLoadPluginAsync(string directory, string fileName)
+        public async Task DeactivatePluginAsync(IPlugin pluginInstance)
         {
-            FileInfo file = new DirectoryInfo(directory).GetFiles($"{fileName}.dll", SearchOption.AllDirectories).FirstOrDefault();
+            // TODO: add try-catch and log exception when calling plugin UnloadAsync
+            await pluginInstance.UnloadAsync();
 
-            if (file != null)
+            activatedPlugins.Remove(pluginInstance);
+            loadedPlugins.Remove(pluginInstance.Assembly);
+
+            OnPluginDeactivated?.Invoke(pluginInstance);
+        }
+
+        public async Task DeactivatePluginsAsync()
+        {
+            foreach (var pluginInstance in activatedPlugins)
             {
-                await LoadPluginAsync(file.FullName);
-                return true;
+                await DeactivatePluginAsync(pluginInstance);
             }
-            return false;
-        }
-
-        public Task UnloadPluginAsync(string name)
-        {
-            var plugin = activatedPlugins.FirstOrDefault(x => x.Name.Equals(name));
-            if (plugin != null)
-            {
-                activatedPlugins.Remove(plugin);
-                loadedPlugins.Remove(plugin.Assembly);
-            }
-            return Task.CompletedTask;
-        }
-
-        public Task UnloadPluginsAsync()
-        {
-            activatedPlugins.Clear();
-            loadedPlugins.Clear();
-            return Task.CompletedTask;
         }
     }
 }

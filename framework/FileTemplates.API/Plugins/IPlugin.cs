@@ -10,8 +10,8 @@ namespace FileTemplates.API.Plugins
     {
         string Name { get; }
         string Version { get; }
-        Assembly Assembly { get; }        
-
-        Task<Stream> GenerateFileAsync(JObject data);
+        Assembly Assembly { get; }
+        Task LoadAsync();
+        Task UnloadAsync();
     }
 }

@@ -11,12 +11,14 @@ namespace FileTemplates.API.Plugins
     {
         IEnumerable<IPlugin> ActivatedPlugins { get; }
         IEnumerable<Assembly> LoadedPlugins { get; }
+
         Task<IPlugin> ActivatePluginAsync(Assembly assembly);
         Task LoadPluginsAsync(string directory);
-        Task<bool> TryLoadPluginAsync(string directory, string fileName);
-        Task UnloadPluginAsync(string name);
-        Task UnloadPluginsAsync();
+        Task<IPlugin> LoadPluginAsync(string fileFullName);
+        Task DeactivatePluginAsync(IPlugin pluginInstance);
+        Task DeactivatePluginsAsync();
 
-        event PluginLoaded OnPluginLoaded;
+        event PluginActivated OnPluginActivated;
+        event PluginDeactivated OnPluginDeactivated;
     }
 }

@@ -12,14 +12,18 @@ namespace FileTemplates.PluginDemo
         public PluginDemo(ILogger logger)
         {
             this.logger = logger;
-            logger.LogAsync("Hello people");
         }
 
         public override string Name => "PluginDemo";
-        public override async Task<Stream> GenerateFileAsync(JObject data)
+
+        public override async Task LoadAsync()
         {
-            await logger.LogAsync("PluginDemo generating file");
-            return await base.GenerateFileAsync(data);
+            await logger.LogAsync($"Hello folks from PluginDemo!");
+        }
+
+        public override async Task UnloadAsync()
+        {
+            await logger.LogAsync($"Goodbye folks from PluginDemo!");
         }
     }
 }

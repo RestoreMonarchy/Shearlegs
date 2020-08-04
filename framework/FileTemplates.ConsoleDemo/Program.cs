@@ -24,9 +24,14 @@ namespace FileTemplates.ConsoleDemo
             await Runtime.InitializeAsync();
 
             Logger = Runtime.Container.Resolve<ILogger>();
-            Runtime.PluginManager.OnPluginLoaded += async (plugin) =>
+            Runtime.PluginManager.OnPluginActivated += async (plugin) =>
             {
-                await Logger.LogAsync($"{plugin.Name} {plugin.Version} has been loadded!");
+                await Logger.LogAsync($"{plugin.Name} {plugin.Version} has been loaded!");
+            };
+
+            Runtime.PluginManager.OnPluginDeactivated += async (plugin) =>
+            {
+                await Logger.LogAsync($"{plugin.Name} {plugin.Version} has been deactivated!");
             };
 
             await Runtime.StartAsync();

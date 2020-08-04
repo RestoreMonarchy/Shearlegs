@@ -11,7 +11,7 @@ namespace FileTemplates.Core.Plugins
         public Plugin()
         {
             Assembly = GetType().Assembly;
-            Name = Assembly.GetName().Name;
+            Name = GetType().Name;
             Version = Assembly.GetName().Version.ToString();
         }
 
@@ -19,9 +19,14 @@ namespace FileTemplates.Core.Plugins
         public virtual string Version { get; }
         public Assembly Assembly { get; }
 
-        public virtual Task<Stream> GenerateFileAsync(JObject data)
+        public virtual Task LoadAsync()
         {
-            return Task.FromResult(Stream.Null);
+            return Task.CompletedTask;
+        }
+
+        public virtual Task UnloadAsync()
+        {
+            return Task.CompletedTask;
         }
     }
 }
