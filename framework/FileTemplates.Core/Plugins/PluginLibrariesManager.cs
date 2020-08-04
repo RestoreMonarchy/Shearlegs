@@ -25,7 +25,7 @@ namespace FileTemplates.Core.Plugins
 
         public Task LoadLibrariesAsync(string directory)
         {
-            IEnumerable<FileInfo> libraryFiles = new DirectoryInfo(directory).GetFiles(".dll", SearchOption.AllDirectories);
+            IEnumerable<FileInfo> libraryFiles = new DirectoryInfo(directory).GetFiles("*.dll", SearchOption.AllDirectories);
 
             foreach (var file in libraryFiles)
             {

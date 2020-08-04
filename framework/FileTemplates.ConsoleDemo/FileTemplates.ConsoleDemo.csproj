@@ -1,17 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Autofac" Version="5.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.6" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FileTemplates.API\FileTemplates.API.csproj" />
     <ProjectReference Include="..\FileTemplates.Core\FileTemplates.Core.csproj" />
+    <ProjectReference Include="..\FileTemplates.Runtime\FileTemplates.Runtime.csproj" />
   </ItemGroup>
 
 </Project>

@@ -10,13 +10,14 @@ namespace FileTemplates.Core.Plugins
     {
         public Plugin()
         {
-            Name = Assembly.GetName().Name;
             Assembly = GetType().Assembly;
+            Name = Assembly.GetName().Name;
+            Version = Assembly.GetName().Version.ToString();
         }
 
         public virtual string Name { get; }
-        public virtual Assembly Assembly { get; }
-
+        public virtual string Version { get; }
+        public Assembly Assembly { get; }
 
         public virtual Task<Stream> GenerateFileAsync(JObject data)
         {
