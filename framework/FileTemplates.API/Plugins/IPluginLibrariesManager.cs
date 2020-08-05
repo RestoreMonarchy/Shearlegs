@@ -9,6 +9,6 @@ namespace FileTemplates.API.Plugins
     public interface IPluginLibrariesManager
     {
         IEnumerable<Assembly> LoadedLibraries { get; }
-        Task LoadLibrariesAsync(string directory);
+        Task LoadLibrariesAsync();
     }
 }

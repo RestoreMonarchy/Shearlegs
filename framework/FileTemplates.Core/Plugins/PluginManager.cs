@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using FileTemplates.API.Plugins;
 using FileTemplates.API.Plugins.Delegates;
+using FileTemplates.Core.Constants;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,12 +36,14 @@ namespace FileTemplates.Core.Plugins
             var pluginType = assembly.GetTypes().FirstOrDefault(x => x.GetInterface(nameof(IPlugin)) != null);
             var configurationType = assembly.GetTypes().FirstOrDefault(x => x.GetCustomAttribute<ConfigurationAttribute>()?.PluginType?.Equals(pluginType) ?? false);
 
+            Directory.CreateDirectory(DirectoryConstants.PluginDirectory(pluginType.Name));
+
             IPlugin pluginInstance;
 
             var configuration = typeof(PluginHelper)
                 .GetMethod(nameof(PluginHelper.ReadPluginConfiguration), BindingFlags.Static | BindingFlags.Public)
                 .MakeGenericMethod(configurationType)
-                .Invoke(null, new object[] { PluginHelper.GetPluginConfigurationFileName(pluginType) });
+                .Invoke(null, new object[] { DirectoryConstants.PluginConfigurationFile(pluginType.Name) });
 
             using (var scope = lifetimeScope.BeginLifetimeScope(cb =>
             {
@@ -60,9 +63,9 @@ namespace FileTemplates.Core.Plugins
             return pluginInstance;
         }
 
-        public async Task LoadPluginsAsync(string directory)
+        public async Task LoadPluginsAsync()
         {
-            IEnumerable<FileInfo> pluginFiles = new DirectoryInfo(directory).GetFiles("*.dll", SearchOption.AllDirectories);
+            IEnumerable<FileInfo> pluginFiles = new DirectoryInfo(DirectoryConstants.PluginsDirectory).GetFiles("*.dll", SearchOption.AllDirectories);
 
             foreach (var file in pluginFiles)
             {

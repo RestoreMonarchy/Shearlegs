@@ -1,4 +1,5 @@
 ﻿using FileTemplates.API.Plugins;
+using FileTemplates.Core.Constants;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,9 +24,9 @@ namespace FileTemplates.Core.Plugins
 
         public IEnumerable<Assembly> LoadedLibraries => loadedLibraries;
 
-        public Task LoadLibrariesAsync(string directory)
+        public Task LoadLibrariesAsync()
         {
-            IEnumerable<FileInfo> libraryFiles = new DirectoryInfo(directory).GetFiles("*.dll", SearchOption.AllDirectories);
+            IEnumerable<FileInfo> libraryFiles = new DirectoryInfo(DirectoryConstants.LibrariesDirectory).GetFiles("*.dll", SearchOption.AllDirectories);
 
             foreach (var file in libraryFiles)
             {

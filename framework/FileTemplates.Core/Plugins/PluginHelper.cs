@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using FileTemplates.Core.Constants;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -22,8 +23,6 @@ namespace FileTemplates.Core.Plugins
 
             SerializeToJsonFile(path, obj);
         }
-
-        public static string GetPluginConfigurationFileName(Type pluginType) => Path.Combine("Plugins", $"{pluginType.Name}.configuration.json");
 
         public static T DeserializeFromJsonFile<T>(string path) where T : class
         {

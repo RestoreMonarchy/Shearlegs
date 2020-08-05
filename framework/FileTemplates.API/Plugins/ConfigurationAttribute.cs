@@ -5,7 +5,7 @@ using System.Text;
 namespace FileTemplates.API.Plugins
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public sealed class ConfigurationAttribute : Attribute
+    public sealed class ConfigurationAttribute  : Attribute
     {
         public Type PluginType { get; }
 

@@ -8,7 +8,6 @@ namespace FileTemplates.API.Plugins
         string Name { get; }
         string Version { get; }
         Assembly Assembly { get; }
-        string ConfigurationFileName { get; }
 
         Task LoadAsync();
         Task UnloadAsync();

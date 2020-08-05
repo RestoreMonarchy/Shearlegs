@@ -38,8 +38,8 @@ namespace FileTemplates.Runtime
 
         public async Task StartAsync()
         {
-            await PluginLibrariesManager.LoadLibrariesAsync("Libraries");
-            await PluginManager.LoadPluginsAsync("Plugins");
+            await PluginLibrariesManager.LoadLibrariesAsync();
+            await PluginManager.LoadPluginsAsync();
         }
         
         public async Task StopAsync()

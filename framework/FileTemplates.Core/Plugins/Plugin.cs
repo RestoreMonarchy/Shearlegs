@@ -1,6 +1,4 @@
 ﻿using FileTemplates.API.Plugins;
-using System;
-using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -13,13 +11,11 @@ namespace FileTemplates.Core.Plugins
             Assembly = GetType().Assembly;
             Name = GetType().Name;
             Version = Assembly.GetName().Version.ToString();
-            ConfigurationFileName = Name + ".configuration.json";
         }
 
         public virtual string Name { get; }
         public virtual string Version { get; }
         public Assembly Assembly { get; }
-        public string ConfigurationFileName { get; }
 
         public virtual Task LoadAsync()
         {

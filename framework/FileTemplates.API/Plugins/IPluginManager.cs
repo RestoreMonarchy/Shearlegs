@@ -13,7 +13,7 @@ namespace FileTemplates.API.Plugins
         IEnumerable<Assembly> LoadedPlugins { get; }
 
         Task<IPlugin> ActivatePluginAsync(Assembly assembly);
-        Task LoadPluginsAsync(string directory);
+        Task LoadPluginsAsync();
         Task<IPlugin> LoadPluginAsync(string fileFullName);
         Task DeactivatePluginAsync(IPlugin pluginInstance);
         Task DeactivatePluginsAsync();
