@@ -3,7 +3,6 @@ using FileTemplates.API.Logging;
 using FileTemplates.API.Plugins;
 using FileTemplates.Core.Logging;
 using FileTemplates.Core.Plugins;
-using System;
 using System.IO;
 using System.Threading.Tasks;
 

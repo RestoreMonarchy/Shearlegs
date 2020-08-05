@@ -9,15 +9,19 @@ namespace FileTemplates.PluginDemo
     public class PluginDemo : Plugin
     {
         private readonly ILogger logger;
-        public PluginDemo(ILogger logger)
+        private readonly PluginDemoConfiguration configuration;
+
+        public PluginDemo(ILogger logger, PluginDemoConfiguration configuration)
         {
             this.logger = logger;
+            this.configuration = configuration;
         }
 
         public override string Name => "PluginDemo";
 
         public override async Task LoadAsync()
         {
+            await logger.LogAsync($"{configuration.SampleConfigProperty}");
             await logger.LogAsync($"Hello folks from PluginDemo!");
         }
 

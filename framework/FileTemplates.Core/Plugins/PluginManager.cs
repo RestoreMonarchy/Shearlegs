@@ -33,11 +33,18 @@ namespace FileTemplates.Core.Plugins
         public async Task<IPlugin> ActivatePluginAsync(Assembly assembly)
         {
             var pluginType = assembly.GetTypes().FirstOrDefault(x => x.GetInterface(nameof(IPlugin)) != null);
+            var configurationType = assembly.GetTypes().FirstOrDefault(x => x.GetCustomAttribute<ConfigurationAttribute>()?.PluginType?.Equals(pluginType) ?? false);
 
             IPlugin pluginInstance;
 
+            var configuration = typeof(PluginHelper)
+                .GetMethod(nameof(PluginHelper.ReadPluginConfiguration), BindingFlags.Static | BindingFlags.Public)
+                .MakeGenericMethod(configurationType)
+                .Invoke(null, new object[] { PluginHelper.GetPluginConfigurationFileName(pluginType) });
+
             using (var scope = lifetimeScope.BeginLifetimeScope(cb =>
             {
+                cb.RegisterInstance(configuration).As(configurationType).SingleInstance().ExternallyOwned();
                 cb.RegisterType(pluginType).As(pluginType).As<IPlugin>().SingleInstance().ExternallyOwned();
             }))
             {

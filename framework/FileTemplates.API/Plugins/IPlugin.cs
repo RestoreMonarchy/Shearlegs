@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Threading.Tasks;
 
 namespace FileTemplates.API.Plugins
@@ -11,6 +8,8 @@ namespace FileTemplates.API.Plugins
         string Name { get; }
         string Version { get; }
         Assembly Assembly { get; }
+        string ConfigurationFileName { get; }
+
         Task LoadAsync();
         Task UnloadAsync();
     }
