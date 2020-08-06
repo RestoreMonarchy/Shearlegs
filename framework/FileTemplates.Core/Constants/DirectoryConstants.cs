@@ -9,6 +9,9 @@ namespace FileTemplates.Core.Constants
     {
         public const string PluginsDirectory = "Plugins";
         public const string LibrariesDirectory = "Libraries";
+        public const string LogsDirectory = "Logs";
+
+        public static string LogFile(string sessionId) => Path.Combine(LogsDirectory, $"{sessionId}.log");
 
         public static string PluginDirectory(string pluginName) => Path.Combine(PluginsDirectory, pluginName);
         public static string PluginConfigurationFile(string pluginName) => Path.Combine(PluginDirectory(pluginName), $"{pluginName}.configuration.json");
