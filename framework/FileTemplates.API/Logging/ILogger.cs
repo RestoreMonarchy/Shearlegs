@@ -9,5 +9,6 @@ namespace FileTemplates.API.Logging
     public interface ILogger
     {
         Task LogAsync(string message);
+        Task LogExceptionAsync(Exception e, string message = null);
     }
 }

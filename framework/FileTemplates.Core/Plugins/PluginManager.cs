@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using FileTemplates.API.Logging;
 using FileTemplates.API.Plugins;
 using FileTemplates.API.Plugins.Delegates;
 using FileTemplates.Core.Constants;
@@ -14,6 +15,7 @@ namespace FileTemplates.Core.Plugins
     public class PluginManager : IPluginManager
     {
         private readonly ILifetimeScope lifetimeScope;
+        private readonly ILogger logger;
 
         private readonly List<Assembly> loadedPlugins;
         private readonly List<IPlugin> activatedPlugins;
@@ -24,9 +26,10 @@ namespace FileTemplates.Core.Plugins
         public IEnumerable<Assembly> LoadedPlugins => loadedPlugins;
         public IEnumerable<IPlugin> ActivatedPlugins => activatedPlugins;
 
-        public PluginManager(ILifetimeScope lifetimeScope)
+        public PluginManager(ILifetimeScope lifetimeScope, ILogger logger)
         {
             this.lifetimeScope = lifetimeScope;
+            this.logger = logger;
             loadedPlugins = new List<Assembly>();
             activatedPlugins = new List<IPlugin>();
         }
@@ -41,31 +44,59 @@ namespace FileTemplates.Core.Plugins
 
             Directory.CreateDirectory(DirectoryConstants.PluginDirectory(pluginType.Name));
 
-            IPlugin pluginInstance;
+            // Load plugin configuration
+            object configuration = null;
+            try
+            {
+                configuration = typeof(PluginHelper)
+                    .GetMethod(nameof(PluginHelper.ReadPluginConfiguration), BindingFlags.Static | BindingFlags.Public)
+                    .MakeGenericMethod(configurationType)
+                    .Invoke(null, new object[] { DirectoryConstants.PluginConfigurationFile(pluginType.Name) });
+            } catch (Exception e)
+            {
+                await logger.LogExceptionAsync(e, $"Failed to load {pluginType.Name} configuration!");
+                return null;
+            }
 
-            // TODO: add try-catch and log exception when reading plugin configuration
-            var configuration = typeof(PluginHelper)
-                .GetMethod(nameof(PluginHelper.ReadPluginConfiguration), BindingFlags.Static | BindingFlags.Public)
-                .MakeGenericMethod(configurationType)
-                .Invoke(null, new object[] { DirectoryConstants.PluginConfigurationFile(pluginType.Name) });
-
+            // Load plugin translations
             IDictionary<string, string> translations = null;
             if (defaultTranslations != null)
-                translations = PluginHelper.ReadPluginTranslations(DirectoryConstants.PluginTranslationsFile(pluginType.Name), defaultTranslations);
+            {
+                try
+                {
+                    translations = PluginHelper.ReadPluginTranslations(DirectoryConstants.PluginTranslationsFile(pluginType.Name), defaultTranslations);
+                } catch (Exception e)
+                {
+                    await logger.LogExceptionAsync(e, $"Failed to load {pluginType.Name} translations!");
+                    return null;
+                }                
+            }
+
+            IPlugin pluginInstance;
 
             using (var scope = lifetimeScope.BeginLifetimeScope(cb =>
             {
                 cb.RegisterInstance(configuration).As(configurationType).SingleInstance().ExternallyOwned();
                 if (translations != null)
                     cb.RegisterInstance(translations).As<IDictionary<string, string>>().SingleInstance().ExternallyOwned();
+                else
+                    cb.RegisterInstance(new Dictionary<string, string>()).As<IDictionary<string, string>>().SingleInstance().ExternallyOwned();
                 cb.RegisterType(pluginType).As(pluginType).As<IPlugin>().SingleInstance().ExternallyOwned();
             }))
             {
                 pluginInstance = scope.Resolve(pluginType) as IPlugin;
             }
 
-            // TODO: add try-catch and log exception when calling plugin LoadAsync
-            await pluginInstance.LoadAsync();
+            // Execute plugin LoadAsync method
+            try
+            {
+                await pluginInstance.LoadAsync();
+            } catch (Exception e)
+            {
+                await logger.LogExceptionAsync(e, $"An exception occurated when executing {pluginType.Name} LoadAsync method");
+                await DeactivatePluginAsync(pluginInstance);
+                return null;
+            }
 
             activatedPlugins.Add(pluginInstance);
 
@@ -92,11 +123,16 @@ namespace FileTemplates.Core.Plugins
 
         public async Task DeactivatePluginAsync(IPlugin pluginInstance)
         {
-            // TODO: add try-catch and log exception when calling plugin UnloadAsync
-            await pluginInstance.UnloadAsync();
+            // Execute plugin UnloadAsync method
+            try
+            {
+                await pluginInstance.UnloadAsync();
+            } catch (Exception e)
+            {
+                await logger.LogExceptionAsync(e, $"An exception occurated when executing {pluginInstance.Name} UnloadAsync method");
+            }
 
             activatedPlugins.Remove(pluginInstance);
-            loadedPlugins.Remove(pluginInstance.Assembly);
 
             OnPluginDeactivated?.Invoke(pluginInstance);
         }
