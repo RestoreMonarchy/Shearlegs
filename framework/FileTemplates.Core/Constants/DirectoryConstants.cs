@@ -11,6 +11,7 @@ namespace FileTemplates.Core.Constants
         public const string LibrariesDirectory = "Libraries";
 
         public static string PluginDirectory(string pluginName) => Path.Combine(PluginsDirectory, pluginName);
-        public static string PluginConfigurationFile(string pluginName) => Path.Combine(PluginDirectory(pluginName), pluginName + ".configuration.json");
+        public static string PluginConfigurationFile(string pluginName) => Path.Combine(PluginDirectory(pluginName), $"{pluginName}.configuration.json");
+        public static string PluginTranslationsFile(string pluginName) => Path.Combine(PluginDirectory(pluginName), $"{pluginName}.translations.json");
     }
 }

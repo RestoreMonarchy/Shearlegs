@@ -1,4 +1,5 @@
 ﻿using FileTemplates.API.Plugins;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 

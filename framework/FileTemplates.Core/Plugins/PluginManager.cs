@@ -32,22 +32,32 @@ namespace FileTemplates.Core.Plugins
         }
 
         public async Task<IPlugin> ActivatePluginAsync(Assembly assembly)
-        {
+        {            
             var pluginType = assembly.GetTypes().FirstOrDefault(x => x.GetInterface(nameof(IPlugin)) != null);
             var configurationType = assembly.GetTypes().FirstOrDefault(x => x.GetCustomAttribute<ConfigurationAttribute>()?.PluginType?.Equals(pluginType) ?? false);
+            var defaultTranslations = pluginType.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                .FirstOrDefault(x => x.GetCustomAttribute<DefaultTranslationsAttribute>() != null)?
+                .GetValue(null) as IDictionary<string, string> ?? null;
 
             Directory.CreateDirectory(DirectoryConstants.PluginDirectory(pluginType.Name));
 
             IPlugin pluginInstance;
 
+            // TODO: add try-catch and log exception when reading plugin configuration
             var configuration = typeof(PluginHelper)
                 .GetMethod(nameof(PluginHelper.ReadPluginConfiguration), BindingFlags.Static | BindingFlags.Public)
                 .MakeGenericMethod(configurationType)
                 .Invoke(null, new object[] { DirectoryConstants.PluginConfigurationFile(pluginType.Name) });
 
+            IDictionary<string, string> translations = null;
+            if (defaultTranslations != null)
+                translations = PluginHelper.ReadPluginTranslations(DirectoryConstants.PluginTranslationsFile(pluginType.Name), defaultTranslations);
+
             using (var scope = lifetimeScope.BeginLifetimeScope(cb =>
             {
                 cb.RegisterInstance(configuration).As(configurationType).SingleInstance().ExternallyOwned();
+                if (translations != null)
+                    cb.RegisterInstance(translations).As<IDictionary<string, string>>().SingleInstance().ExternallyOwned();
                 cb.RegisterType(pluginType).As(pluginType).As<IPlugin>().SingleInstance().ExternallyOwned();
             }))
             {

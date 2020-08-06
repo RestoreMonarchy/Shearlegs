@@ -1,13 +1,14 @@
-﻿using FileTemplates.Core.Constants;
+﻿using FileTemplates.API.Plugins;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace FileTemplates.Core.Plugins
 {
     public class PluginHelper
-    {
+    { 
         public static T ReadPluginConfiguration<T>(string path) where T : class
         {
             if (!File.Exists(path))
@@ -22,6 +23,17 @@ namespace FileTemplates.Core.Plugins
                 obj = Activator.CreateInstance<T>();
 
             SerializeToJsonFile(path, obj);
+        }
+
+        public static IDictionary<string, string> ReadPluginTranslations(string path, IDictionary<string, string> defaultTranslations)
+        {
+            if (!File.Exists(path))
+            {
+                SerializeToJsonFile(path, defaultTranslations);
+                return defaultTranslations;
+            }
+
+            return DeserializeFromJsonFile<IDictionary<string, string>>(path);
         }
 
         public static T DeserializeFromJsonFile<T>(string path) where T : class
