@@ -33,8 +33,6 @@ namespace FileTemplates.PluginDemo
             await logger.LogAsync($"Hello {translations["Hello"]}");
             await logger.LogAsync($"{configuration.SampleConfigProperty}");
             await logger.LogAsync($"Hello folks from PluginDemo!");
-            int num = 0;
-            await logger.LogAsync($"10 / 0 = {10 / num}");
         }
 
         public override async Task UnloadAsync()

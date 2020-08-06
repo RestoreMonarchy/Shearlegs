@@ -6,7 +6,6 @@ using FileTemplates.Core;
 using FileTemplates.Core.Constants;
 using FileTemplates.Core.Logging;
 using FileTemplates.Core.Plugins;
-using System;
 using System.IO;
 using System.Threading.Tasks;
 

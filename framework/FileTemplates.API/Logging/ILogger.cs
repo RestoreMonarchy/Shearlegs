@@ -10,5 +10,6 @@ namespace FileTemplates.API.Logging
     {
         Task LogAsync(string message);
         Task LogExceptionAsync(Exception e, string message = null);
+        Task LogInformationAsync(string message);
     }
 }
