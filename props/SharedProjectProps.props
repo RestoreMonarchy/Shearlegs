@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <PackageId>$(AssemblyName)</PackageId>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageTags>Shearlegs Plugin Framework</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/RestoreMonarchy/Shearlegs</PackageProjectUrl>
+    <PackageOwners>RestoreMonarchy;MCrow</PackageOwners>
+    <Authors>MCrow</Authors>
+	<Version>0.0.0</Version>
+    <Company>RestoreMonarchy</Company>
+    <Copyright>RestoreMonarchy &lt;restoremonarchy.com&gt;</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <LangVersion>8</LangVersion>
+  </PropertyGroup>
+</Project>
