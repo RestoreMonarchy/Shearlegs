@@ -8,7 +8,7 @@ Shearlegs is universal .NET plugin framework
 * Logger writes everything to file
 
 
-### Example
+### Usage
 [SamplePlugin.cs](samples/SamplePlugin/SamplePlugin.cs)
 ```cs
 public class SamplePlugin : Plugin
