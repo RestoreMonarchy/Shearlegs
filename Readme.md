@@ -9,7 +9,7 @@ Shearlegs is universal .NET plugin framework
 
 
 ### Example
-SamplePlugin.cs
+[SamplePlugin.cs](samples/SamplePlugin/SamplePlugin.cs)
 ```cs
 public class SamplePlugin : Plugin
 {
@@ -45,7 +45,7 @@ public class SamplePlugin : Plugin
     }
 }
 ```
-SamplePluginConfiguration.cs
+[SamplePluginConfiguration.cs](samples/SamplePlugin/SamplePluginConfiguration.cs)
 ```cs
 [Configuration(typeof(SamplePlugin))]
 public class SamplePluginConfiguration
