@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Shearlegs.Core.Plugins
 {
-    public class Plugin : IPlugin
+    public abstract class Plugin : IPlugin
     {
         public Plugin()
         {

@@ -1,8 +1,10 @@
-﻿using Autofac;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Shearlegs.API;
 using Shearlegs.API.Logging;
 using Shearlegs.API.Plugins;
 using Shearlegs.API.Plugins.Delegates;
 using Shearlegs.Core.Constants;
+using Shearlegs.Core.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,8 +16,8 @@ namespace Shearlegs.Core.Plugins
 {
     public class PluginManager : IPluginManager
     {
-        private readonly ILifetimeScope lifetimeScope;
         private readonly ILogger logger;
+        private readonly ISession session;
 
         private readonly List<Assembly> loadedPlugins;
         private readonly List<IPlugin> activatedPlugins;
@@ -26,10 +28,10 @@ namespace Shearlegs.Core.Plugins
         public IEnumerable<Assembly> LoadedPlugins => loadedPlugins;
         public IEnumerable<IPlugin> ActivatedPlugins => activatedPlugins;
 
-        public PluginManager(ILifetimeScope lifetimeScope, ILogger logger)
+        public PluginManager(ILogger logger, ISession session)
         {
-            this.lifetimeScope = lifetimeScope;
             this.logger = logger;
+            this.session = session;
             loadedPlugins = new List<Assembly>();
             activatedPlugins = new List<IPlugin>();
         }
@@ -88,18 +90,20 @@ namespace Shearlegs.Core.Plugins
                 return null;
             }
 
+
+            // Add plugin required services
             IPlugin pluginInstance;
 
-            using (var scope = lifetimeScope.BeginLifetimeScope(cb =>
-            {
-                if (configuration != null)
-                cb.RegisterInstance(configuration).As(configurationType).SingleInstance().ExternallyOwned();
-                cb.RegisterInstance(translations).As<IDictionary<string, string>>().SingleInstance().ExternallyOwned();
-                cb.RegisterType(pluginType).As(pluginType).As<IPlugin>().SingleInstance().ExternallyOwned();
-            }))
-            {
-                pluginInstance = scope.Resolve(pluginType) as IPlugin;
-            }
+            IServiceCollection serviceCollection = new ServiceCollection();
+
+            if (configuration != null)
+                serviceCollection.AddSingleton(configurationType, configuration);
+            serviceCollection.AddSingleton(translations);
+            serviceCollection.AddSingleton(pluginType);
+            serviceCollection.AddTransient<ILogger, Logger>();
+            serviceCollection.AddSingleton(session);
+            IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
+            pluginInstance = serviceProvider.GetRequiredService(pluginType) as IPlugin;
 
             // Execute plugin LoadAsync method
             try
