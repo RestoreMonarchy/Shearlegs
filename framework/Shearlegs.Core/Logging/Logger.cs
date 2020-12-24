@@ -1,8 +1,10 @@
-﻿using Shearlegs.API;
+﻿using Microsoft.Extensions.Hosting;
+using Shearlegs.API;
 using Shearlegs.API.Logging;
 using Shearlegs.Core.Constants;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shearlegs.Core.Logging
