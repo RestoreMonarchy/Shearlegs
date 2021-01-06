@@ -22,6 +22,12 @@ namespace Shearlegs.Web.Server.Controllers
             this.pluginManager = pluginManager;
         }
 
+        [HttpGet("plugins")]
+        public IActionResult GetPluginsAsync()
+        {
+            return Ok(pluginManager.ActivatedPlugins.Select(x => x.Name));
+        }
+
         [HttpPost("{pluginName}")]
         public async Task<IActionResult> PostAsync(string pluginName)
         {
