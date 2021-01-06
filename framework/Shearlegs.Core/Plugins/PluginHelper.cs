@@ -1,31 +1,11 @@
-﻿using Shearlegs.API.Plugins;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using Shearlegs.Core.Translations;
 
 namespace Shearlegs.Core.Plugins
 {
     public class PluginHelper
-    { 
-        public static T ReadPluginConfiguration<T>(string path) where T : class
-        {
-            if (!File.Exists(path))
-                SavePluginConfiguration<T>(path, null);
-            
-            return DeserializeFromJsonFile<T>(path);
-        }
-
-        public static void SavePluginConfiguration<T>(string path, T obj) where T : class
-        {
-            if (obj == null)
-                obj = Activator.CreateInstance<T>();
-
-            SerializeToJsonFile(path, obj);
-        }
-
+    {
         public static T DeserializeFromJsonFile<T>(string path) where T : class
         {
             string content;

@@ -25,7 +25,7 @@ namespace Shearlegs.Runtime
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
-        {
+        {            
             Directory.CreateDirectory(DirectoryConstants.LibrariesDirectory);
             Directory.CreateDirectory(DirectoryConstants.PluginsDirectory);
             Directory.CreateDirectory(DirectoryConstants.LogsDirectory);
@@ -45,6 +45,6 @@ namespace Shearlegs.Runtime
             serviceCollection.AddSingleton<IPluginManager, PluginManager>();
             serviceCollection.AddSingleton<IPluginLibrariesManager, PluginLibrariesManager>();
             serviceCollection.AddTransient<ILogger, Logger>();
-        }        
+        }
     }
 }

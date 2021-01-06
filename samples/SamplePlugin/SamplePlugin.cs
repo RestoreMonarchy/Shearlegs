@@ -6,37 +6,25 @@ using System.Threading.Tasks;
 
 namespace SamplePlugin
 {
-    public class SamplePlugin : PluginBase
+    public class SamplePlugin : ReportPlugin
     {
         public override string Name => "SamplePlugin";
 
         private readonly ILogger logger;
-        private readonly SamplePluginConfiguration configuration;
-        private readonly IDictionary<string, string> translations;
 
-        public SamplePlugin(ILogger logger, SamplePluginConfiguration configuration, IDictionary<string, string> translations)
+        public SamplePlugin(ILogger logger)
         {
             this.logger = logger;
-            this.configuration = configuration;
-            this.translations = translations;
         }
 
-        [DefaultTranslations]
-        private static IDictionary<string, string> DefaultTranslations = new Dictionary<string, string>()
+        public override async Task ActivateAsync()
         {
-            { "Hello", "World!" }
-        };
-
-        public override async Task LoadAsync()
-        {
-            await logger.LogAsync($"Hello {translations["Hello"]}");
-            await logger.LogAsync($"{configuration.HelloWorld}");
-            await logger.LogAsync($"Hello folks from {Name}!");
+            await logger.LogAsync("Siema");
         }
 
-        public override async Task UnloadAsync()
+        public override async Task DeactivateAsync()
         {
-            await logger.LogAsync($"Goodbye folks from {Name}!");
+            await logger.LogAsync("Bajo");
         }
     }
 }

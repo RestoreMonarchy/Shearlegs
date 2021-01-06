@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Shearlegs.API.Plugins
 {
-    public interface ITranslations : IDictionary<string, string>
+    public interface IPluginParameters
     {
     }
 }

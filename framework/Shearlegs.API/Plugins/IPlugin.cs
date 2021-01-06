@@ -10,7 +10,7 @@ namespace Shearlegs.API.Plugins
         string Version { get; }
         Assembly Assembly { get; }
 
-        Task LoadAsync();
-        Task UnloadAsync();
+        Task ActivateAsync();
+        Task DeactivateAsync();
     }
 }

@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shearlegs.API;
-using Shearlegs.API.Attributes;
 using Shearlegs.API.Logging;
 using Shearlegs.API.Plugins;
 using Shearlegs.API.Plugins.Delegates;
 using Shearlegs.Core.Constants;
 using Shearlegs.Core.Logging;
-using Shearlegs.Core.Translations;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,14 +36,6 @@ namespace Shearlegs.Core.Plugins
             activatedPlugins = new List<IPlugin>();
         }
 
-        private object LoadConfigurationInstance(Type configurationType, Type pluginType)
-        {
-            return typeof(PluginHelper)
-                .GetMethod(nameof(PluginHelper.ReadPluginConfiguration), BindingFlags.Static | BindingFlags.Public)
-                .MakeGenericMethod(configurationType)
-                .Invoke(null, new object[] { DirectoryConstants.PluginConfigurationFile(pluginType.Name) });
-        }
-
         public async Task<IPlugin> ActivatePluginAsync(Assembly assembly)
         {            
             var pluginType = assembly.GetTypes().FirstOrDefault(x => x.GetInterface(nameof(IPlugin)) != null);
@@ -56,41 +46,16 @@ namespace Shearlegs.Core.Plugins
                 return null;
             }
 
-            var configurationType = assembly.GetTypes()
-                .FirstOrDefault(x => x.GetCustomAttribute<ConfigurationAttribute>()?.PluginType?.Equals(pluginType) ?? false);
-
             var services = assembly.GetTypes().Where(x => x.GetCustomAttribute<ServiceAttribute>() != null);
 
-            Directory.CreateDirectory(DirectoryConstants.PluginDirectory(pluginType.Name));
-
-            // Load plugin configuration
-            object configuration = null;
-
-            if (configurationType != null)
-            {
-                try
-                {
-                    configuration = LoadConfigurationInstance(configurationType, pluginType);
-                }
-                catch (Exception e)
-                {
-                    await logger.LogExceptionAsync(e, $"Failed to load {pluginType.Name} configuration!");
-                    return null;
-                }
-            }
-
-
-            // Add plugin required services
+            // Add plugin as singleton service
             IPlugin pluginInstance;
-
             IServiceCollection serviceCollection = new ServiceCollection();
-
-            if (configuration != null)
-                serviceCollection.AddSingleton(configurationType, configuration);
-
             serviceCollection.AddSingleton(pluginType);
-            serviceCollection.AddTransient<ILogger, Logger>();
+
+            // Add logger service with ISession
             serviceCollection.AddSingleton(session);
+            serviceCollection.AddTransient<ILogger, Logger>();            
             
             // Add plugin custom services
             foreach (var service in services)
@@ -105,10 +70,10 @@ namespace Shearlegs.Core.Plugins
             // Execute plugin LoadAsync method
             try
             {
-                await pluginInstance.LoadAsync();
+                await pluginInstance.ActivateAsync();
             } catch (Exception e)
             {
-                await logger.LogExceptionAsync(e, $"An exception occurated when executing {pluginType.Name} LoadAsync method");
+                await logger.LogExceptionAsync(e, $"An exception occurated when loading {pluginInstance.Name} {pluginInstance.Version}");
                 await DeactivatePluginAsync(pluginInstance);
                 return null;
             }
@@ -124,7 +89,13 @@ namespace Shearlegs.Core.Plugins
 
             foreach (var file in pluginFiles)
             {
-                await LoadPluginAsync(file.FullName);
+                try
+                {
+                    await LoadPluginAsync(file.FullName);
+                } catch (Exception e)
+                {
+                    await logger.LogExceptionAsync(e, $"An exception occurated when trying to load plugin {file.FullName}");
+                }                
             }
         }
 
@@ -140,10 +111,10 @@ namespace Shearlegs.Core.Plugins
             // Execute plugin UnloadAsync method
             try
             {
-                await pluginInstance.UnloadAsync();
+                await pluginInstance.DeactivateAsync();
             } catch (Exception e)
             {
-                await logger.LogExceptionAsync(e, $"An exception occurated when executing {pluginInstance.Name} UnloadAsync method");
+                await logger.LogExceptionAsync(e, $"An exception occurated when unloading {pluginInstance.Name} {pluginInstance.Version}");
             }
 
             activatedPlugins.Remove(pluginInstance);
@@ -152,9 +123,9 @@ namespace Shearlegs.Core.Plugins
 
         public async Task DeactivatePluginsAsync()
         {
-            foreach (var pluginInstance in activatedPlugins)
+            while (activatedPlugins.Count != 0)
             {
-                await DeactivatePluginAsync(pluginInstance);
+                await DeactivatePluginAsync(activatedPlugins[0]);
             }
         }
     }
