@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Shearlegs.Core.Translations;
 
 namespace Shearlegs.Core.Plugins
 {
@@ -23,17 +24,6 @@ namespace Shearlegs.Core.Plugins
                 obj = Activator.CreateInstance<T>();
 
             SerializeToJsonFile(path, obj);
-        }
-
-        public static IDictionary<string, string> ReadPluginTranslations(string path, IDictionary<string, string> defaultTranslations)
-        {
-            if (!File.Exists(path))
-            {
-                SerializeToJsonFile(path, defaultTranslations);
-                return defaultTranslations;
-            }
-
-            return DeserializeFromJsonFile<IDictionary<string, string>>(path);
         }
 
         public static T DeserializeFromJsonFile<T>(string path) where T : class

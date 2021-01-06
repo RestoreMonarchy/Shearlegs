@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SamplePlugin
 {
-    public class SamplePlugin : Plugin
+    public class SamplePlugin : PluginBase
     {
         public override string Name => "SamplePlugin";
 

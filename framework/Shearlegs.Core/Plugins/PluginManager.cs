@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shearlegs.API;
+using Shearlegs.API.Attributes;
 using Shearlegs.API.Logging;
 using Shearlegs.API.Plugins;
 using Shearlegs.API.Plugins.Delegates;
 using Shearlegs.Core.Constants;
 using Shearlegs.Core.Logging;
+using Shearlegs.Core.Translations;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -57,9 +59,7 @@ namespace Shearlegs.Core.Plugins
             var configurationType = assembly.GetTypes()
                 .FirstOrDefault(x => x.GetCustomAttribute<ConfigurationAttribute>()?.PluginType?.Equals(pluginType) ?? false);
 
-            var defaultTranslations = pluginType.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
-                .FirstOrDefault(x => x.GetCustomAttribute<DefaultTranslationsAttribute>() != null)?
-                .GetValue(null) as IDictionary<string, string> ?? new Dictionary<string, string>();
+            var services = assembly.GetTypes().Where(x => x.GetCustomAttribute<ServiceAttribute>() != null);
 
             Directory.CreateDirectory(DirectoryConstants.PluginDirectory(pluginType.Name));
 
@@ -79,17 +79,6 @@ namespace Shearlegs.Core.Plugins
                 }
             }
 
-            // Load plugin translations
-            IDictionary<string, string> translations = null;
-            try
-            {
-                translations = PluginHelper.ReadPluginTranslations(DirectoryConstants.PluginTranslationsFile(pluginType.Name), defaultTranslations);
-            } catch (Exception e)
-            {
-                await logger.LogExceptionAsync(e, $"Failed to load {pluginType.Name} translations!");
-                return null;
-            }
-
 
             // Add plugin required services
             IPlugin pluginInstance;
@@ -98,10 +87,18 @@ namespace Shearlegs.Core.Plugins
 
             if (configuration != null)
                 serviceCollection.AddSingleton(configurationType, configuration);
-            serviceCollection.AddSingleton(translations);
+
             serviceCollection.AddSingleton(pluginType);
             serviceCollection.AddTransient<ILogger, Logger>();
             serviceCollection.AddSingleton(session);
+            
+            // Add plugin custom services
+            foreach (var service in services)
+            {
+                serviceCollection.Add(new ServiceDescriptor(service.GetType(), service.GetType(),
+                    service.GetCustomAttribute<ServiceAttribute>().Lifetime));
+            }
+
             IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
             pluginInstance = serviceProvider.GetRequiredService(pluginType) as IPlugin;
 
