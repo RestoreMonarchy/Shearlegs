@@ -11,12 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\framework\Shearlegs.Runtime\Shearlegs.Runtime.csproj" />
     <ProjectReference Include="..\Client\Shearlegs.Web.Client.csproj" />
     <ProjectReference Include="..\Shared\Shearlegs.Web.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 

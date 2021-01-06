@@ -5,7 +5,7 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Shearlegs.Core.Plugins
+namespace Shearlegs.Core.Reports
 {
     public abstract class PluginBase : IPlugin
     {

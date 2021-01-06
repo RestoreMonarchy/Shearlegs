@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shearlegs.Core.Plugins
+namespace Shearlegs.Core.Reports
 {
     public class PluginLibrariesManager : IPluginLibrariesManager
     {

@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace Shearlegs.Core.Plugins
+namespace Shearlegs.Core.Reports
 {
     public class PluginHelper
     {

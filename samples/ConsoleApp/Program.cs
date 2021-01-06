@@ -13,7 +13,7 @@ namespace ConsoleApp
     class Program
     {
         public static Program Instance { get; private set; }
-        public Runtime Runtime { get; private set; }
+        public ShearlegsRuntime Runtime { get; private set; }
 
         static void Main(string[] args)
         {
@@ -23,8 +23,8 @@ namespace ConsoleApp
 
         void ConfigureServices(IServiceCollection services)
         {
-            Runtime.RegisterServices(services);
-            services.AddHostedService<Runtime>();
+            ShearlegsRuntime.RegisterServices(services);
+            services.AddHostedService<ShearlegsRuntime>();
         }
 
         async Task MainAsync()

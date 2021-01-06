@@ -1,16 +1,17 @@
 ﻿using Newtonsoft.Json.Linq;
+using Shearlegs.API.Reports;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Shearlegs.Core.Plugins
+namespace Shearlegs.Core.Reports
 {
-    public class PluginParameters
+    public class ReportParameters : IReportParameters
     {
         private readonly string json;
         private readonly JObject data;
 
-        public PluginParameters(string json)
+        public ReportParameters(string json)
         {
             this.json = json;
             data = JObject.Parse(this.json);

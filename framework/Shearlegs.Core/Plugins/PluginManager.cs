@@ -12,7 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Shearlegs.Core.Plugins
+namespace Shearlegs.Core.Reports
 {
     public class PluginManager : IPluginManager
     {

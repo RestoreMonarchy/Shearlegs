@@ -6,26 +6,26 @@ using Shearlegs.API.Plugins;
 using Shearlegs.Core;
 using Shearlegs.Core.Constants;
 using Shearlegs.Core.Logging;
-using Shearlegs.Core.Plugins;
+using Shearlegs.Core.Reports;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shearlegs.Runtime
 {
-    public class Runtime : IHostedService
+    public class ShearlegsRuntime : IHostedService
     {
         private readonly IPluginManager pluginManager;
         private readonly IPluginLibrariesManager pluginLibrariesManager;
 
-        public Runtime(IPluginManager pluginManager, IPluginLibrariesManager pluginLibrariesManager)
+        public ShearlegsRuntime(IPluginManager pluginManager, IPluginLibrariesManager pluginLibrariesManager)
         {
             this.pluginManager = pluginManager;
             this.pluginLibrariesManager = pluginLibrariesManager;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
-        {            
+        {
             Directory.CreateDirectory(DirectoryConstants.LibrariesDirectory);
             Directory.CreateDirectory(DirectoryConstants.PluginsDirectory);
             Directory.CreateDirectory(DirectoryConstants.LogsDirectory);

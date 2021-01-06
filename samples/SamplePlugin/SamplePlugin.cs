@@ -1,7 +1,9 @@
 ﻿using Shearlegs.API.Logging;
 using Shearlegs.API.Plugins;
-using Shearlegs.Core.Plugins;
+using Shearlegs.API.Reports;
+using Shearlegs.Core.Reports;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SamplePlugin
@@ -25,6 +27,26 @@ namespace SamplePlugin
         public override async Task DeactivateAsync()
         {
             await logger.LogAsync("Bajo");
+        }
+
+        public override async Task<IReportFile> GenerateReportAsync(IReportParameters parameters)
+        {
+            var report = new ReportFile()
+            {
+                Name = "sample.txt",
+                MimeType = "text/plain"
+            };
+
+            using (var ms = new MemoryStream())
+            {
+                TextWriter tw = new StreamWriter(ms);
+                await tw.WriteAsync("Siemaneczko ziomeczki!");
+                await tw.FlushAsync();
+                ms.Position = 0;
+                report.Data = ms.ToArray();
+            }
+
+            return report;
         }
     }
 }
