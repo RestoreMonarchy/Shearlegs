@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Shearlegs.API.Plugins;
+using Shearlegs.API.Reports;
 using Shearlegs.Core.Reports;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Shearlegs.Web.Server.Controllers
@@ -22,14 +25,20 @@ namespace Shearlegs.Web.Server.Controllers
         [HttpPost("{pluginName}")]
         public async Task<IActionResult> PostAsync(string pluginName)
         {
-            var plugin = pluginManager.ActivatedPlugins.Where(x => x as ReportPlugin != null).FirstOrDefault(x => x.Name == pluginName) as ReportPlugin;
-
+            ReportPlugin plugin = pluginManager.ActivatedPlugins.Where(x => x as ReportPlugin != null)
+                .FirstOrDefault(x => x.Name == pluginName) as ReportPlugin;
+            
             if (plugin == null)
             {
                 return BadRequest();
             } else
             {
-                var report = await plugin.GenerateReportAsync(null);
+                IReportParameters parameters;
+                using (var reader = new StreamReader(Request.Body))
+                {
+                    parameters = new ReportParameters(await reader.ReadToEndAsync());
+                }
+                var report = await plugin.GenerateReportAsync(parameters);
                 return File(report.Data, report.MimeType, report.Name);
             }
         }

@@ -8,26 +8,44 @@ namespace Shearlegs.Core.Reports
 {
     public class ReportParameters : IReportParameters
     {
-        private readonly string json;
-        private readonly JObject data;
+        public string Data { get; }
+        private readonly JObject obj;
 
-        public ReportParameters(string json)
+        public ReportParameters(string data)
         {
-            this.json = json;
-            data = JObject.Parse(this.json);
+            Data = data;
+            obj = JObject.Parse(data); 
         }
 
         public T GetValue<T>(string key) where T : IConvertible
         {
-            return data[key].ToObject<T>();
+            if (TryGetValue(key, out T value))
+            {
+                return value;
+            }
+            throw new ArgumentException($"Parameter key {key} not found");
         }
 
-        public string this[string key]
+        public bool TryGetValue<T>(string key, out T value) where T : IConvertible
         {
-            get
+            value = default;
+            if (obj.TryGetValue(key, out JToken token))
             {
-                return GetValue<string>(key);
+                value = token.ToObject<T>();
+                return true;
             }
+            return false;
         }
+
+        public T GetValueOrDefault<T>(string key, T defaultValue = default) where T : IConvertible
+        {
+            if (TryGetValue(key, out T value))
+            {
+                return value;
+            }
+            return defaultValue;
+        }
+
+        public string this[string key] => GetValue<string>(key);
     }
 }

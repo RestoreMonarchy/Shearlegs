@@ -33,14 +33,14 @@ namespace SamplePlugin
         {
             var report = new ReportFile()
             {
-                Name = "sample.txt",
+                Name = $"{parameters["FileId"]}.txt",
                 MimeType = "text/plain"
             };
 
             using (var ms = new MemoryStream())
             {
                 TextWriter tw = new StreamWriter(ms);
-                await tw.WriteAsync("Siemaneczko ziomeczki!");
+                await tw.WriteAsync(parameters.GetValueOrDefault("Message", "Siema!"));
                 await tw.FlushAsync();
                 ms.Position = 0;
                 report.Data = ms.ToArray();
