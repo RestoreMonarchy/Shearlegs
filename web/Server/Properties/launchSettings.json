@@ -16,7 +16,7 @@
           "ASPNETCORE_ENVIRONMENT": "Development"
         }
       },
-      "ShearlegsWeb.Server": {
+      "Shearlegs.Web.Server": {
         "commandName": "Project",
         "dotnetRunMessages": "true",
         "launchBrowser": true,

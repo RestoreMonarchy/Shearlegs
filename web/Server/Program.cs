@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ShearlegsWeb.Server
+namespace Shearlegs.Web.Server
 {
     public class Program
     {

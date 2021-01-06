@@ -1,8 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+    <AssemblyName>Shearlegs.Web.Client</AssemblyName>
+    <RootNamespace>Shearlegs.Web.Client</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Shared\ShearlegsWeb.Shared.csproj" />
+    <ProjectReference Include="..\Shared\Shearlegs.Web.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

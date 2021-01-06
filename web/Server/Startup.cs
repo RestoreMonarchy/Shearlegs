@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
 
-namespace ShearlegsWeb.Server
+namespace Shearlegs.Web.Server
 {
     public class Startup
     {

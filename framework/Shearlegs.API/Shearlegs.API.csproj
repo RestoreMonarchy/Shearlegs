@@ -4,6 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>API abstractions for Shearlegs</Description>
+    <RootNamespace>Shearlegs.API</RootNamespace>
+    <AssemblyName>Shearlegs.API</AssemblyName>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)..\..\props\SharedProjectProps.props" />
