@@ -15,11 +15,14 @@
         <label>Report Parameters (json)</label>
     </div>
 
-    <button class="btn btn-primary mt-3" @onclick="PostReportAsync" disabled="@(selectedPluginName == null)">Get Report</button>
+    <button class="btn btn-primary mt-3" @onclick="PostReportAsync" disabled="@(selectedPluginName == null)">Generate Report</button>
 
 
     <div class="mt-5">
-        <textarea class="form-control" style="height: 250px;" @bind="fileContent" />
+        @if (reportArchive != null)
+        {
+            <a class="btn btn-primary" href="/api/reports/archive/@reportArchive.Id/file">Download @reportArchive.Name</a>
+        }
     </div>
 }
 
@@ -30,7 +33,7 @@
     private string selectedPluginName = string.Empty;
     private string json = "{ }";
 
-    private string fileContent = string.Empty;
+    private ReportArchive reportArchive;
 
     private IEnumerable<string> Plugins { get; set; }
 
@@ -43,6 +46,6 @@
     private async Task PostReportAsync()
     {
         var response = await HttpClient.PostAsync($"api/reports/{selectedPluginName}", new StringContent(json));
-        fileContent = await response.Content.ReadAsStringAsync();
+        reportArchive = await response.Content.ReadFromJsonAsync<ReportArchive>();
     }
 }

@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
 using Shearlegs.Runtime;
+using System.Data.SqlClient;
+using Shearlegs.Web.Server.Repositories;
 
 namespace Shearlegs.Web.Server
 {
@@ -23,6 +25,9 @@ namespace Shearlegs.Web.Server
         {
             ShearlegsRuntime.RegisterServices(services);
             services.AddHostedService<ShearlegsRuntime>();
+
+            services.AddTransient(x => new SqlConnection(Configuration.GetConnectionString("Default")));
+            services.AddTransient<ReportsRepository>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
