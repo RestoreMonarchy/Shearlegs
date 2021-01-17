@@ -40,9 +40,12 @@ namespace Shearlegs.Web.Server.Controllers
             return File(reportArchive.Content, reportArchive.MimeType, reportArchive.Name);
         }
 
-        [HttpPost("{pluginName}")]
-        public async Task<IActionResult> PostAsync(string pluginName)
+        [HttpPost("{reportId}/execute")]
+        public async Task<IActionResult> PostAsync(int reportId)
         {
+            var report = await reportsRepository.GetReportAsync(reportId);
+            await pluginManager.ExecuteReportPluginAsync(report.Name, report.Plugin.Content, Array.Empty<byte[]>());
+
             ReportPlugin plugin = pluginManager.ActivatedPlugins.Where(x => x as ReportPlugin != null)
                 .FirstOrDefault(x => x.Name == pluginName) as ReportPlugin;
             
@@ -60,7 +63,7 @@ namespace Shearlegs.Web.Server.Controllers
                 IReportParameters parameters = new ReportParameters(requestBody);
                 var report = await plugin.GenerateReportAsync(parameters);
 
-                var reportArchive = new ReportArchive() 
+                var reportArchive = new ReportArchiveModel() 
                 { 
                     Name = report.Name,
                     Content = report.Data,
