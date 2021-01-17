@@ -1,4 +1,5 @@
 ﻿using Shearlegs.API.Plugins.Delegates;
+using Shearlegs.API.Reports;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -9,16 +10,6 @@ namespace Shearlegs.API.Plugins
 {
     public interface IPluginManager
     {
-        IEnumerable<IPlugin> ActivatedPlugins { get; }
-        IEnumerable<Assembly> LoadedPlugins { get; }
-
-        Task<IPlugin> ActivatePluginAsync(Assembly assembly);
-        Task LoadPluginsAsync();
-        Task<IPlugin> LoadPluginAsync(string fileFullName);
-        Task DeactivatePluginAsync(IPlugin pluginInstance);
-        Task DeactivatePluginsAsync();
-
-        event PluginActivated OnPluginActivated;
-        event PluginDeactivated OnPluginDeactivated;
+        Task<IReportFile> ExecuteReportPluginAsync(string pluginName, byte[] pluginData, IEnumerable<byte[]> libraries);
     }
 }

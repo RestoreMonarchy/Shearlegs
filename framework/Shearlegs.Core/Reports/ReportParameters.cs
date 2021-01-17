@@ -14,7 +14,7 @@ namespace Shearlegs.Core.Reports
         public ReportParameters(string data)
         {
             Data = data;
-            obj = JObject.Parse(data); 
+            obj = JObject.Parse(data);
         }
 
         public T GetValue<T>(string key) where T : IConvertible
