@@ -10,6 +10,6 @@ namespace Shearlegs.API.Plugins
 {
     public interface IPluginManager
     {
-        Task<IReportFile> ExecuteReportPluginAsync(string pluginName, byte[] pluginData, IEnumerable<byte[]> libraries);
+        Task<IReportFile> ExecuteReportPluginAsync(string pluginName, string jsonParameters, byte[] pluginData, IEnumerable<byte[]> libraries);
     }
 }

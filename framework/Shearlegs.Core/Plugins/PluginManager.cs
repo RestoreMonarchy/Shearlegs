@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Shearlegs.API;
 using Shearlegs.API.Logging;
 using Shearlegs.API.Plugins;
@@ -26,7 +27,7 @@ namespace Shearlegs.Core.Reports
             this.session = session;
         }
 
-        public async Task<IReportFile> ExecuteReportPluginAsync(string pluginName, byte[] pluginData, IEnumerable<byte[]> libraries)
+        public async Task<IReportFile> ExecuteReportPluginAsync(string pluginName, string jsonParameters, byte[] pluginData, IEnumerable<byte[]> libraries)
         { 
             var appDomain = AppDomain.CreateDomain(pluginName);
 
@@ -34,7 +35,7 @@ namespace Shearlegs.Core.Reports
                 appDomain.Load(libraryData);
 
             var pluginAssembly = appDomain.Load(pluginData);
-            var plugin = await ActivatePluginAsync(pluginAssembly) as IReportPlugin;
+            var plugin = await ActivatePluginAsync(pluginAssembly, jsonParameters) as IReportPlugin<object>;
 
             IReportFile reportFile = null;
             try
@@ -49,7 +50,7 @@ namespace Shearlegs.Core.Reports
             return reportFile;
         }
 
-        private async Task<IPlugin> ActivatePluginAsync(Assembly assembly)
+        private async Task<IPlugin> ActivatePluginAsync(Assembly assembly, string jsonParameters)
         {
             var pluginType = assembly.GetTypes().FirstOrDefault(x => x.GetInterface(nameof(IPlugin)) != null);
 
@@ -79,8 +80,19 @@ namespace Shearlegs.Core.Reports
 
             IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
             pluginInstance = serviceProvider.GetRequiredService(pluginType) as IPlugin;
+            
+            UpdatePluginParameters(pluginInstance, jsonParameters);
 
             return pluginInstance;
+        }
+
+        private void UpdatePluginParameters(IPlugin pluginInstance, string jsonString)
+        {
+            var plugin = pluginInstance as IReportPlugin<object>;
+
+            var parameters = JsonConvert.DeserializeObject(jsonString, plugin.Parameters.GetType());
+
+            plugin.GetType().GetProperty("Parameters", BindingFlags.Public | BindingFlags.Instance).SetValue(plugin, parameters);
         }
     }
 }

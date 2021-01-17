@@ -26,10 +26,24 @@ namespace Shearlegs.Web.Server.Controllers
             this.reportsRepository = reportsRepository;
         }
 
-        [HttpGet("plugins")]
-        public IActionResult GetPluginsAsync()
+        [HttpGet]
+        public async Task<IActionResult> GetPluginsAsync()
         {
-            return Ok(pluginManager.ActivatedPlugins.Select(x => x.Name));
+            return Ok(await reportsRepository.GetReportsAsync());
+        }
+
+        [HttpPost("plugin")]
+        public async Task<IActionResult> PostPluginAsync([FromBody] ReportPluginModel reportPluginModel)
+        {
+            await reportsRepository.AddReportPluginAsync(reportPluginModel);
+            return Ok(reportPluginModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PostAsync([FromBody] ReportModel reportModel)
+        {
+            await reportsRepository.AddReportAsync(reportModel);
+            return Ok(reportModel);
         }
 
 
@@ -43,38 +57,27 @@ namespace Shearlegs.Web.Server.Controllers
         [HttpPost("{reportId}/execute")]
         public async Task<IActionResult> PostAsync(int reportId)
         {
-            var report = await reportsRepository.GetReportAsync(reportId);
-            await pluginManager.ExecuteReportPluginAsync(report.Name, report.Plugin.Content, Array.Empty<byte[]>());
-
-            ReportPlugin plugin = pluginManager.ActivatedPlugins.Where(x => x as ReportPlugin != null)
-                .FirstOrDefault(x => x.Name == pluginName) as ReportPlugin;
+            var reportModel = await reportsRepository.GetReportAsync(reportId);
             
-            if (plugin == null)
+            string requestBody;
+            using (var reader = new StreamReader(Request.Body))
             {
-                return BadRequest();
-            } else
-            {
-                string requestBody;
-                using (var reader = new StreamReader(Request.Body))
-                {
-                    requestBody = await reader.ReadToEndAsync();
-                }
-
-                IReportParameters parameters = new ReportParameters(requestBody);
-                var report = await plugin.GenerateReportAsync(parameters);
-
-                var reportArchive = new ReportArchiveModel() 
-                { 
-                    Name = report.Name,
-                    Content = report.Data,
-                    MimeType = report.MimeType,
-                    PluginName = plugin.Name,
-                    Parameters = requestBody
-                };
-
-                reportArchive = await reportsRepository.ArchiveReportAsync(reportArchive);
-                return Ok(reportArchive);
+                requestBody = await reader.ReadToEndAsync();
             }
+
+            var report = await pluginManager.ExecuteReportPluginAsync(reportModel.Name, requestBody, reportModel.Plugin.Content, Array.Empty<byte[]>());
+
+            var reportArchive = new ReportArchiveModel()
+            {
+                Name = report.Name,
+                Content = report.Data,
+                MimeType = report.MimeType,
+                PluginName = report.Name,
+                Parameters = requestBody
+            };
+
+            reportArchive = await reportsRepository.ArchiveReportAsync(reportArchive);
+            return Ok(reportArchive);
         }
     }
 }

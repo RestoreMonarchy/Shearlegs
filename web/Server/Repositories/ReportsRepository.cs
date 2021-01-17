@@ -34,7 +34,7 @@ namespace Shearlegs.Web.Server.Repositories
         {
             const string sql = "SELECT r.*, p.* FROM dbo.Reports r JOIN dbo.ReportPlugins p ON r.PluginId = p.Id WHERE r.Id = @id;";
 
-            var reports = await connection.QueryAsync<ReportModel, ReportPluginModel, ReportModel>(sql, (r, p) => 
+            var reports = await connection.QueryAsync<ReportModel, ReportPluginModel, ReportModel>(sql, (r, p) =>
             {
                 r.Plugin = p;
                 return r;
@@ -47,6 +47,23 @@ namespace Shearlegs.Web.Server.Repositories
         {
             const string sql = "SELECT * FROM dbo.Reports;";
             return await connection.QueryAsync<ReportModel>(sql);
+        }
+
+        public async Task AddReportAsync(ReportModel reportModel)
+        {
+            const string sql = "INSERT INTO dbo.Reports (Name, Description, Enabled) " +
+                "VALUES (@Name, @Description, @Enabled); SELECT SCOPE_IDENTITY();";
+            reportModel.Id = await connection.ExecuteScalarAsync<int>(sql, reportModel);
+        }
+
+        public async Task AddReportPluginAsync(ReportPluginModel reportPluginModel)
+        {
+            const string sql = "INSERT INTO dbo.ReportPlugins (ReportId, Version, Changelog, Content, TemplateContent, TemplateMimeType, TemplateFileName) " +
+                "VALUES (@ReportId, @Version, @Changelog, @Content, @TemplateContent, @TemplateMimeType, @TemplateFileName); SELECT SCOPE_IDENTITY();";
+            const string sql1 = "UPDATE dbo.Reports SET PluginId = @Id WHERE Id = @ReportId;";
+
+            reportPluginModel.Id = await connection.ExecuteScalarAsync<int>(sql, reportPluginModel);
+            await connection.ExecuteAsync(sql1, reportPluginModel);
         }
     }
 }

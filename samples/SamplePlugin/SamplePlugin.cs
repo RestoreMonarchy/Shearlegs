@@ -8,7 +8,13 @@ using System.Threading.Tasks;
 
 namespace SamplePlugin
 {
-    public class SamplePlugin : ReportPlugin
+    public class SampleParameters
+    {
+        public int FileId { get; set; }
+        public string Message { get; set; } = "Welcome everybody";
+    }
+
+    public class SamplePlugin : ReportPlugin<SampleParameters>
     {
         public override string Name => "SamplePlugin";
 
@@ -19,28 +25,18 @@ namespace SamplePlugin
             this.logger = logger;
         }
 
-        public override async Task ActivateAsync()
-        {
-            await logger.LogAsync("Siema");
-        }
-
-        public override async Task DeactivateAsync()
-        {
-            await logger.LogAsync("Bajo");
-        }
-
-        public override async Task<IReportFile> GenerateReportAsync(IReportParameters parameters)
+        public override async Task<IReportFile> GenerateReportAsync()
         {
             var report = new ReportFile()
             {
-                Name = $"{parameters["FileId"]}.txt",
+                Name = $"{Parameters.FileId}.txt",
                 MimeType = "text/plain"
             };
 
             using (var ms = new MemoryStream())
             {
                 TextWriter tw = new StreamWriter(ms);
-                await tw.WriteAsync(parameters.GetValueOrDefault("Message", "Siema!"));
+                await tw.WriteAsync(Parameters.Message);
                 await tw.FlushAsync();
                 ms.Position = 0;
                 report.Data = ms.ToArray();

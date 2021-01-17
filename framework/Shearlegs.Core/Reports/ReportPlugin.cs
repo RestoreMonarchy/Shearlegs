@@ -8,16 +8,13 @@ using System.Threading.Tasks;
 
 namespace Shearlegs.Core.Reports
 {
-    public class ReportPlugin : PluginBase, IReportPlugin
+    public class ReportPlugin<T> : PluginBase, IReportPlugin<T> where T : class
     {
+        public T Parameters { get; }
+
         public virtual Task<IReportFile> GenerateReportAsync()
         {
             return null;
         }
-    }
-
-    public class ReportPlugin<T> : ReportPlugin where T : IReportParameters
-    {
-        public T Parameters { get; }
     }
 }

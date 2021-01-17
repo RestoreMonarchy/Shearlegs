@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Shearlegs.API.Reports
 {
-    public interface IReportPlugin : IPlugin
+    public interface IReportPlugin<T> : IPlugin where T : class
     {
-        Task<IReportFile> GenerateReportAsync();
+        T Parameters { get; }
+
+        Task<IReportFile> GenerateReportAsync();        
     }
 }

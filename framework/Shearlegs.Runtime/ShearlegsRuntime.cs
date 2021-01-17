@@ -31,12 +31,10 @@ namespace Shearlegs.Runtime
             Directory.CreateDirectory(DirectoryConstants.LogsDirectory);
 
             await pluginLibrariesManager.LoadLibrariesAsync();
-            await pluginManager.LoadPluginsAsync();
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            await pluginManager.DeactivatePluginsAsync();
         }
 
         public static void RegisterServices(IServiceCollection serviceCollection)

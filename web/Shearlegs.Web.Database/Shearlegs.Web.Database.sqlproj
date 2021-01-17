@@ -60,8 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="tables\ReportsArchive.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shearlegs.Web.Database.publish.xml" />
+    <Build Include="tables\ReportPlugins.sql" />
+    <Build Include="tables\Reports.sql" />
   </ItemGroup>
 </Project>
