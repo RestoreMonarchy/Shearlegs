@@ -9,6 +9,7 @@ namespace Shearlegs.Web.Shared.Models
     public class ReportPluginModel
     {
         public int Id { get; set; }
+        public int ReportId { get; set; }
         public string Version { get; set; }
         public string Changelog { get; set; }
         public byte[] Content { get; set; }

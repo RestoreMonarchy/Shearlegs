@@ -8,7 +8,7 @@ namespace Shearlegs.API.Reports
 {
     public interface IReportPlugin<T> : IPlugin where T : class
     {
-        T Parameters { get; }
+        T Parameters { get; set; }
 
         Task<IReportFile> GenerateReportAsync();        
     }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SamplePlugin
 {
-    public class SampleParameters
+    public class SampleParameters : Parameters
     {
         public int FileId { get; set; }
         public string Message { get; set; } = "Welcome everybody";

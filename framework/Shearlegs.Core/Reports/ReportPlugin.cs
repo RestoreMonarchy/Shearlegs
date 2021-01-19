@@ -10,7 +10,7 @@ namespace Shearlegs.Core.Reports
 {
     public class ReportPlugin<T> : PluginBase, IReportPlugin<T> where T : class
     {
-        public T Parameters { get; }
+        public T Parameters { get; set; }
 
         public virtual Task<IReportFile> GenerateReportAsync()
         {

@@ -73,6 +73,37 @@
             <button class="btn btn-primary" type="submit">Submit</button>
         </EditForm>
     </div>
+
+    <div class="bg-light mt-3 p-4">
+        <h1>Add Report Plugin</h1>
+
+        <EditForm OnValidSubmit="AddPluginReportAsync" Model="ReportPluginModel" class="mt-3">
+            <div class="mb-3">
+                <label class="form-label">Plugin</label>
+                <InputSelect @bind-Value="ReportPluginModel.ReportId" class="form-control">
+                    @foreach (var report in Reports)
+                        {
+                        <option value="@report.Id">@report.Name</option>
+                        }
+                </InputSelect>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Version</label>
+                <InputText @bind-Value="ReportPluginModel.Version" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Changelog</label>
+                <InputTextArea @bind-Value="ReportPluginModel.Changelog" class="form-control" rows="3" />
+            </div>
+
+            <div class="mb-3">
+                <label for="formFile" class="form-label">plugin .dll file</label>
+                <InputFile OnChange="OnInputFileChange" class="form-control" />
+            </div>
+
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </EditForm>
+    </div>
 }
 
 
@@ -103,7 +134,7 @@
         var response = await HttpClient.PostAsJsonAsync("api/reports/plugin", ReportPluginModel);
         var reportPlugin = await response.Content.ReadFromJsonAsync<ReportPluginModel>();
 
-        var report = Reports.SingleOrDefault(x => x.Id == reportPlugin.Id);
+        var report = Reports.Single(x => x.PluginId == reportPlugin.Id);
 
         report.Plugin = reportPlugin;
 
@@ -120,7 +151,19 @@
 
     public async Task GenerateReportAsync()
     {
-        var response = await HttpClient.PostAsync($"api/reports/{selectedReportId}", new StringContent(json));
+        var response = await HttpClient.PostAsync($"api/reports/{selectedReportId}/execute", new StringContent(json));
         reportArchive = await response.Content.ReadFromJsonAsync<ReportArchiveModel>();
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        Console.WriteLine(e.File.Name);
+        Console.WriteLine(e.File.Size);
+        ReportPluginModel.Content = new byte[e.File.Size];
+        await e.File.OpenReadStream().ReadAsync(ReportPluginModel.Content);
+
+        Console.WriteLine("cool we got a file");
+        Console.WriteLine(ReportPluginModel.Content.Length);
+        Console.WriteLine("yes");
     }
 }

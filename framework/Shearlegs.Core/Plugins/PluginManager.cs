@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Threading.Tasks;
 
 namespace Shearlegs.Core.Reports
@@ -27,14 +28,24 @@ namespace Shearlegs.Core.Reports
             this.session = session;
         }
 
+        private class SimpleAssemblyLoadContext : AssemblyLoadContext 
+        {
+            internal SimpleAssemblyLoadContext() : base(isCollectible: true)
+            {
+            }
+
+            protected override Assembly Load(AssemblyName assemblyName) => null;
+        }
+
+
         public async Task<IReportFile> ExecuteReportPluginAsync(string pluginName, string jsonParameters, byte[] pluginData, IEnumerable<byte[]> libraries)
-        { 
-            var appDomain = AppDomain.CreateDomain(pluginName);
-
+        {
+            var context = new SimpleAssemblyLoadContext();
+            
             foreach (var libraryData in libraries)
-                appDomain.Load(libraryData);
+                context.LoadFromStream(new MemoryStream(libraryData));
 
-            var pluginAssembly = appDomain.Load(pluginData);
+            var pluginAssembly = context.LoadFromStream(new MemoryStream(pluginData));
             var plugin = await ActivatePluginAsync(pluginAssembly, jsonParameters) as IReportPlugin<object>;
 
             IReportFile reportFile = null;
@@ -46,7 +57,7 @@ namespace Shearlegs.Core.Reports
                 await logger.LogExceptionAsync(e);
             }
 
-            AppDomain.Unload(appDomain);
+            context.Unload();
             return reportFile;
         }
 
@@ -88,11 +99,12 @@ namespace Shearlegs.Core.Reports
 
         private void UpdatePluginParameters(IPlugin pluginInstance, string jsonString)
         {
-            var plugin = pluginInstance as IReportPlugin<object>;
+            var plugin = pluginInstance as IReportPlugin<>;
 
-            var parameters = JsonConvert.DeserializeObject(jsonString, plugin.Parameters.GetType());
+            var property = pluginInstance.GetType().GetProperty("Parameters");
+            var parameters = JsonConvert.DeserializeObject(jsonString, property.PropertyType);
 
-            plugin.GetType().GetProperty("Parameters", BindingFlags.Public | BindingFlags.Instance).SetValue(plugin, parameters);
+            property.SetValue(plugin, parameters);
         }
     }
 }
