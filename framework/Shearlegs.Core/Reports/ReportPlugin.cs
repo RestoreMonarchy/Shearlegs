@@ -1,4 +1,5 @@
-﻿using Shearlegs.API.Plugins;
+﻿using Newtonsoft.Json;
+using Shearlegs.API.Plugins;
 using Shearlegs.API.Reports;
 using System;
 using System.Collections.Generic;
@@ -8,13 +9,11 @@ using System.Threading.Tasks;
 
 namespace Shearlegs.Core.Reports
 {
-    public class ReportPlugin<T> : PluginBase, IReportPlugin<T> where T : class
+    public class ReportPlugin : PluginBase, IReportPlugin
     {
-        public T Parameters { get; set; }
-
         public virtual Task<IReportFile> GenerateReportAsync()
         {
-            return null;
+            throw new NotImplementedException();
         }
     }
 }

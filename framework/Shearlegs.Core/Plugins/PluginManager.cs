@@ -46,7 +46,7 @@ namespace Shearlegs.Core.Reports
                 context.LoadFromStream(new MemoryStream(libraryData));
 
             var pluginAssembly = context.LoadFromStream(new MemoryStream(pluginData));
-            var plugin = await ActivatePluginAsync(pluginAssembly, jsonParameters) as IReportPlugin<object>;
+            var plugin = await ActivatePluginAsync(pluginAssembly, jsonParameters) as IReportPlugin;
 
             IReportFile reportFile = null;
             try
@@ -72,15 +72,16 @@ namespace Shearlegs.Core.Reports
             }
 
             var services = assembly.GetTypes().Where(x => x.GetCustomAttribute<ServiceAttribute>() != null);
+            var parameters = assembly.GetTypes().FirstOrDefault(x => x.GetCustomAttribute<ParametersAttribute>() != null);
 
             // Add plugin as singleton service
-            IPlugin pluginInstance;
+            IReportPlugin pluginInstance;
             IServiceCollection serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton(pluginType);
 
             // Add logger service with ISession
             serviceCollection.AddSingleton(session);
-            serviceCollection.AddTransient<ILogger, Logger>();            
+            serviceCollection.AddTransient<ILogger, Logger>();
             
             // Add plugin custom services
             foreach (var service in services)
@@ -89,22 +90,12 @@ namespace Shearlegs.Core.Reports
                     service.GetCustomAttribute<ServiceAttribute>().Lifetime));
             }
 
+            serviceCollection.Add(new ServiceDescriptor(parameters, JsonConvert.DeserializeObject(jsonParameters, parameters)));
+
             IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
-            pluginInstance = serviceProvider.GetRequiredService(pluginType) as IPlugin;
-            
-            UpdatePluginParameters(pluginInstance, jsonParameters);
+            pluginInstance = serviceProvider.GetRequiredService(pluginType) as IReportPlugin;
 
             return pluginInstance;
-        }
-
-        private void UpdatePluginParameters(IPlugin pluginInstance, string jsonString)
-        {
-            var plugin = pluginInstance as IReportPlugin<>;
-
-            var property = pluginInstance.GetType().GetProperty("Parameters");
-            var parameters = JsonConvert.DeserializeObject(jsonString, property.PropertyType);
-
-            property.SetValue(plugin, parameters);
         }
     }
 }
