@@ -56,6 +56,13 @@ namespace Shearlegs.Web.Server.Repositories
             reportModel.Id = await connection.ExecuteScalarAsync<int>(sql, reportModel);
         }
 
+        public async Task UpdateReportAsync(ReportModel reportModel)
+        {
+            const string sql = "UPDATE dbo.Reports SET Name = @Name, Description = @Description, Enabled = @Enabled " +
+                "WHERE Id = @Id;";
+            await connection.ExecuteAsync(sql, reportModel);
+        }
+
         public async Task AddReportPluginAsync(ReportPluginModel reportPluginModel)
         {
             const string sql = "INSERT INTO dbo.ReportPlugins (ReportId, Version, Changelog, Content, TemplateContent, TemplateMimeType, TemplateFileName) " +

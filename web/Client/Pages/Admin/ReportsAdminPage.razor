@@ -1,0 +1,64 @@
+﻿@page "/admin/reports"
+
+@if (Reports != null)
+{
+    <div class="mt-5">
+        <button class="btn btn-primary btn-lg" @onclick="AddReportAsync">Add</button>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Enabled</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var report in Reports)
+            {
+                <tr>
+                    <td>@report.Id</td>
+                    <td>@report.Name</td>
+                    <td>@report.Description</td>
+                    <td>@report.Enabled</td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="javascript:void(0)" @onclick="() => EditReportAsync(report)">Edit</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+} else
+{
+    <ProgressBar />
+}
+
+<Modal @ref="Modal" T="ReportModel" ModalSize="EModalSize.Large" ModelFactory="() => new ReportModel()" OnCreated="PostReportAsync" OnUpdated="PutReportAsync">
+    @if (Modal != null && Modal.Model != null)
+    {
+        <div class="mb-3">
+            <label>Title</label>
+            <input @bind="@Modal.Model.Name" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label>Description</label>
+            <textarea @bind="@Modal.Model.Description" class="form-control" rows="5" />
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" @bind="@Modal.Model.Enabled">
+            <label class="form-check-label">
+                Enabled
+            </label>
+        </div>
+    }
+</Modal>

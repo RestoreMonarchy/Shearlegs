@@ -27,9 +27,23 @@ namespace Shearlegs.Web.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPluginsAsync()
+        public async Task<IActionResult> GetReportsAsync()
         {
             return Ok(await reportsRepository.GetReportsAsync());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PostAsync([FromBody] ReportModel reportModel)
+        {
+            await reportsRepository.AddReportAsync(reportModel);
+            return Ok(reportModel);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> PutReportAsync([FromBody] ReportModel reportModel)
+        {
+            await reportsRepository.UpdateReportAsync(reportModel);
+            return Ok();
         }
 
         [HttpPost("plugin")]
@@ -39,12 +53,7 @@ namespace Shearlegs.Web.Server.Controllers
             return Ok(reportPluginModel);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> PostAsync([FromBody] ReportModel reportModel)
-        {
-            await reportsRepository.AddReportAsync(reportModel);
-            return Ok(reportModel);
-        }
+        
 
 
         [HttpGet("archive/{id}/file")]

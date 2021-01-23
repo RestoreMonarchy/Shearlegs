@@ -1,0 +1,96 @@
+﻿@typeparam T
+
+<div class="modal fade" id="@ModalName" tabindex="-1" role="dialog">
+    <div class="modal-dialog @modalSizeClass">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@ModalName</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            @if (Model != null)
+            {
+                <EditForm Model="@Model" OnValidSubmit="SubmitAsync">
+                    <div class="modal-body">
+                        @ChildContent
+
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Submit</button>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; }
+
+    [Parameter]
+    public EventCallback<T> OnCreated { get; set; }
+
+    [Parameter]
+    public EventCallback<T> OnUpdated { get; set; }
+
+    [Parameter]
+    public Func<T> ModelFactory { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public EModalSize ModalSize { get; set; }
+
+    private bool isUpdate;
+
+    public T Model { get; private set; }
+
+    public string ModalName => nameof(Model) + "Modal";
+
+
+    private string modalSizeClass
+    {
+        get
+        {
+            switch (ModalSize)
+            {
+                case EModalSize.Small:
+                    return "modal-sm";
+                case EModalSize.Large:
+                    return "modal-lg";
+                case EModalSize.ExtraLarge:
+                    return "modal-xl";
+                default:
+                    return "";
+            }
+        }
+    }
+
+    public async Task CreateAsync()
+    {
+        Model = ModelFactory.Invoke();
+        isUpdate = false;
+        await JSRuntime.ShowModalStaticAsync(ModalName);
+    }
+
+    public async Task UpdateAsync(T model)
+    {
+        Model = model;
+        isUpdate = true;
+        await JSRuntime.ShowModalStaticAsync(ModalName);
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!isUpdate)
+            await OnCreated.InvokeAsync(Model);
+        else
+            await OnUpdated.InvokeAsync(Model);
+
+        await JSRuntime.HideModalAsync(ModalName);
+    }
+}
