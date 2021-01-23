@@ -1,0 +1,28 @@
+﻿@page "/admin/reports/{ReportId:int}/update"
+
+@if (Report != null)
+{
+    <div class="bg-light mt-3 p-4">
+        <h1>Add Report Plugin</h1>
+        <ul>
+            <li>Last Version: @Report.Plugin.Version</li>
+            <li>Last Changelog: @Report.Plugin.Changelog</li>
+        </ul>
+        <EditForm OnValidSubmit="AddPluginReportAsync" Model="ReportPluginModel" class="mt-3">
+            <div class="mb-3">
+                <label class="form-label">Version</label>
+                <InputText @bind-Value="ReportPluginModel.Version" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Changelog</label>
+                <InputTextArea @bind-Value="ReportPluginModel.Changelog" class="form-control" rows="3" />
+            </div>
+            <div class="mb-3">
+                <label for="formFile" class="form-label">plugin .dll file</label>
+                <InputFile OnChange="OnInputFileChange" class="form-control" />
+            </div>
+
+            <button class="btn btn-primary" type="submit">Update</button>
+        </EditForm>
+    </div>
+}

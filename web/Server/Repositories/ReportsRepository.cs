@@ -32,7 +32,7 @@ namespace Shearlegs.Web.Server.Repositories
 
         public async Task<ReportModel> GetReportAsync(int id)
         {
-            const string sql = "SELECT r.*, p.* FROM dbo.Reports r JOIN dbo.ReportPlugins p ON r.PluginId = p.Id WHERE r.Id = @id;";
+            const string sql = "SELECT r.*, p.* FROM dbo.Reports r LEFT JOIN dbo.ReportPlugins p ON r.PluginId = p.Id WHERE r.Id = @id;";
 
             var reports = await connection.QueryAsync<ReportModel, ReportPluginModel, ReportModel>(sql, (r, p) =>
             {

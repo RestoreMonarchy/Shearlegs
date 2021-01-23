@@ -1,0 +1,22 @@
+﻿@page "/reports/{ReportId:int}/generate"
+
+@if (Report != null)
+{
+    <div class="bg-light mt-3 p-4">
+        <h1>Generate @Report.Name Report</h1>
+        <p class="text-muted">@Report.Description</p>
+        <div class="form-floating mt-3">
+            <textarea class="form-control" style="height: 300px;" @bind="json" />
+            <label>Report Parameters (json)</label>
+        </div>
+
+        <button class="btn btn-primary mt-3" @onclick="GenerateReportAsync">Generate Report</button>
+    </div>
+
+    <div class="mt-5">
+        @if (reportArchive != null)
+        {
+            <a class="btn btn-primary" href="/api/reports/archive/@reportArchive.Id/file">Download @reportArchive.Name</a>
+        }
+    </div>
+}

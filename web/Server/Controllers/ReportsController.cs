@@ -46,6 +46,12 @@ namespace Shearlegs.Web.Server.Controllers
             return Ok();
         }
 
+        [HttpGet("{reportId}")]
+        public async Task<IActionResult> GetReportAsync(int reportId)
+        {
+            return Ok(await reportsRepository.GetReportAsync(reportId));
+        }
+
         [HttpPost("plugin")]
         public async Task<IActionResult> PostPluginAsync([FromBody] ReportPluginModel reportPluginModel)
         {
