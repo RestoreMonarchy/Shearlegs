@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Shearlegs.API.Plugins;
 using Shearlegs.API.Reports;
+using Shearlegs.Core.Plugins;
 using Shearlegs.Core.Reports;
 using Shearlegs.Web.Server.Repositories;
 using Shearlegs.Web.Shared.Models;
@@ -77,8 +78,20 @@ namespace Shearlegs.Web.Server.Controllers
                 requestBody = await reader.ReadToEndAsync();
             }
 
+            ITemplate template = null;
+
+            if (reportModel.Plugin.TemplateContent != null)
+            {
+                template = new Template()
+                {
+                    Data = reportModel.Plugin.TemplateContent,
+                    MimeType = reportModel.Plugin.TemplateMimeType,
+                    FileName = reportModel.Plugin.TemplateFileName
+                };
+            }
+
             var report = await pluginManager.ExecuteReportPluginAsync(reportModel.Name, requestBody, reportModel.Plugin.Content, 
-                reportModel.Plugin.Libraries.Select(x => x.Content));
+                template, reportModel.Plugin.Libraries.Select(x => x.Content));
 
             var reportArchive = new ReportArchiveModel()
             {

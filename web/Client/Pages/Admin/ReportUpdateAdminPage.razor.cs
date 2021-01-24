@@ -30,22 +30,29 @@ namespace Shearlegs.Web.Client.Pages.Admin
         private async Task OnInputFileChange(InputFileChangeEventArgs e)
         {
             ReportPluginModel.Content = new byte[e.File.Size];
-            await e.File.OpenReadStream().ReadAsync(ReportPluginModel.Content);
+            await e.File.OpenReadStream(30 * 1024 * 1024).ReadAsync(ReportPluginModel.Content);
         }
 
         private async Task OnInputLibraryFileChange(InputFileChangeEventArgs e)
         {
             Console.WriteLine("hello");
-            foreach (var file in e.GetMultipleFiles())
+            foreach (var file in e.GetMultipleFiles(100))
             {
                 Console.WriteLine("sup");
                 var library = new ReportPluginLibraryModel();
                 library.Name = file.Name;
                 library.Content = new byte[file.Size];
-                await file.OpenReadStream().ReadAsync(library.Content);
+                await file.OpenReadStream(30 * 1024 * 1024).ReadAsync(library.Content);
                 ReportPluginModel.Libraries.Add(library);
             }
-            StateHasChanged();
+        }
+
+        private async Task OnInputTemplateChange(InputFileChangeEventArgs e)
+        {
+            ReportPluginModel.TemplateFileName = e.File.Name;
+            ReportPluginModel.TemplateMimeType = e.File.ContentType;
+            ReportPluginModel.TemplateContent = new byte[e.File.Size];
+            await e.File.OpenReadStream(30 * 1024 * 1024).ReadAsync(ReportPluginModel.TemplateContent);
         }
 
         private async Task AddPluginReportAsync()

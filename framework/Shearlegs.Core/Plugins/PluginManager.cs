@@ -38,7 +38,7 @@ namespace Shearlegs.Core.Reports
         }
 
 
-        public async Task<IReportFile> ExecuteReportPluginAsync(string pluginName, string jsonParameters, byte[] pluginData, IEnumerable<byte[]> libraries)
+        public async Task<IReportFile> ExecuteReportPluginAsync(string pluginName, string jsonParameters, byte[] pluginData, ITemplate template, IEnumerable<byte[]> libraries)
         {
             var context = new SimpleAssemblyLoadContext();
             
@@ -46,7 +46,7 @@ namespace Shearlegs.Core.Reports
                 context.LoadFromStream(new MemoryStream(libraryData));
 
             var pluginAssembly = context.LoadFromStream(new MemoryStream(pluginData));
-            var plugin = await ActivatePluginAsync(pluginAssembly, jsonParameters) as IReportPlugin;
+            var plugin = await ActivatePluginAsync(pluginAssembly, jsonParameters, template) as IReportPlugin;
 
             IReportFile reportFile = null;
             try
@@ -61,7 +61,7 @@ namespace Shearlegs.Core.Reports
             return reportFile;
         }
 
-        private async Task<IPlugin> ActivatePluginAsync(Assembly assembly, string jsonParameters)
+        private async Task<IPlugin> ActivatePluginAsync(Assembly assembly, string jsonParameters, ITemplate template)
         {
             var pluginType = assembly.GetTypes().FirstOrDefault(x => x.GetInterface(nameof(IPlugin)) != null);
 
@@ -82,7 +82,9 @@ namespace Shearlegs.Core.Reports
             // Add logger service with ISession
             serviceCollection.AddSingleton(session);
             serviceCollection.AddTransient<ILogger, Logger>();
-            
+
+            serviceCollection.AddSingleton(template);
+
             // Add plugin custom services
             foreach (var service in services)
             {

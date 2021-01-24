@@ -1,4 +1,5 @@
-﻿using Shearlegs.API.Logging;
+﻿using OfficeOpenXml;
+using Shearlegs.API.Logging;
 using Shearlegs.API.Plugins;
 using Shearlegs.API.Reports;
 using Shearlegs.Core.Reports;
@@ -21,28 +22,35 @@ namespace SamplePlugin
 
         private readonly ILogger logger;
         private readonly SampleParameters parameters;
+        private readonly ITemplate template;
 
-        public SamplePlugin(ILogger logger, SampleParameters parameters)
+        public SamplePlugin(ILogger logger, SampleParameters parameters, ITemplate template)
         {
             this.logger = logger;
             this.parameters = parameters;
+            this.template = template;
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         }
 
         public override async Task<IReportFile> GenerateReportAsync()
         {
             var report = new ReportFile()
             {
-                Name = $"{parameters.FileId}.txt",
-                MimeType = "text/plain"
+                Name = template.FileName,
+                MimeType = template.MimeType
             };
 
-            using (var ms = new MemoryStream())
+            using (var ms = new MemoryStream(template.Data))
             {
-                TextWriter tw = new StreamWriter(ms);
-                await tw.WriteAsync(parameters.Message);
-                await tw.FlushAsync();
-                ms.Position = 0;
-                report.Data = ms.ToArray();
+                using (var package = new ExcelPackage(ms))
+                {
+                    var shit = package.Workbook.Worksheets["shit"];
+
+                    shit.Cells[2, 2].Value = "simeakdmsoadioqdisjoidja";
+
+                    report.Data = await package.GetAsByteArrayAsync();
+                }
             }
 
             return report;

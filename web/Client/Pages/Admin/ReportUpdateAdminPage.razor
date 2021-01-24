@@ -23,6 +23,11 @@
             </div>
 
             <div class="mb-3">
+                <label class="form-label">template file</label>
+                <InputFile OnChange="OnInputTemplateChange" class="form-control" />
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label">library .dll file</label>
                 <InputFile OnChange="OnInputLibraryFileChange" class="form-control" multiple />
             </div>
@@ -31,7 +36,7 @@
                 <li class="list-group-item disabled">Libraries</li>
                 @foreach (var library in ReportPluginModel.Libraries)
                 {
-                    <li class="list-group-item">@library.Name</li>
+                <li class="list-group-item">@library.Name</li>
                 }
             </ul>
 

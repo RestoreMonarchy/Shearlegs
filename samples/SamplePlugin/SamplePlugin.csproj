@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EPPlus" Version="5.5.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\framework\Shearlegs.API\Shearlegs.API.csproj" />
     <ProjectReference Include="..\..\framework\Shearlegs.Core\Shearlegs.Core.csproj" />
   </ItemGroup>
