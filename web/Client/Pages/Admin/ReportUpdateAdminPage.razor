@@ -18,9 +18,22 @@
                 <InputTextArea @bind-Value="ReportPluginModel.Changelog" class="form-control" rows="3" />
             </div>
             <div class="mb-3">
-                <label for="formFile" class="form-label">plugin .dll file</label>
+                <label class="form-label">plugin .dll file</label>
                 <InputFile OnChange="OnInputFileChange" class="form-control" />
             </div>
+
+            <div class="mb-3">
+                <label class="form-label">library .dll file</label>
+                <InputFile OnChange="OnInputLibraryFileChange" class="form-control" multiple />
+            </div>
+
+            <ul class="list-group mb-3">
+                <li class="list-group-item disabled">Libraries</li>
+                @foreach (var library in ReportPluginModel.Libraries)
+                {
+                    <li class="list-group-item">@library.Name</li>
+                }
+            </ul>
 
             <button class="btn btn-primary" type="submit">Update</button>
         </EditForm>

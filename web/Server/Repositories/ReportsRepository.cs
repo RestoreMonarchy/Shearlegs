@@ -32,15 +32,34 @@ namespace Shearlegs.Web.Server.Repositories
 
         public async Task<ReportModel> GetReportAsync(int id)
         {
-            const string sql = "SELECT r.*, p.* FROM dbo.Reports r LEFT JOIN dbo.ReportPlugins p ON r.PluginId = p.Id WHERE r.Id = @id;";
+            const string sql = "SELECT * FROM dbo.Reports WHERE Id = @id;";
 
-            var reports = await connection.QueryAsync<ReportModel, ReportPluginModel, ReportModel>(sql, (r, p) =>
+            return await connection.QuerySingleOrDefaultAsync<ReportModel>(sql, new { id });
+        }
+
+        public async Task<ReportModel> GetReportPluginAsync(int reportId)
+        {
+            const string sql = "SELECT r.*, p.*, l.* FROM dbo.Reports r LEFT JOIN dbo.ReportPlugins p ON r.PluginId = p.Id " +
+                "LEFT JOIN dbo.ReportPluginLibraries l ON l.PluginId = p.Id WHERE r.Id = @reportId;";
+
+            ReportModel report = null;
+
+            await connection.QueryAsync<ReportModel, ReportPluginModel, ReportPluginLibraryModel, ReportModel>(sql, (r, p, l) => 
             {
-                r.Plugin = p;
-                return r;
-            }, new { id });
+                if (report == null)
+                {
+                    report = r;
+                    report.Plugin = p;
+                    report.Plugin.Libraries = new List<ReportPluginLibraryModel>();
+                }
 
-            return reports.Single();
+                if (l != null)
+                    report.Plugin.Libraries.Add(l);
+
+                return null;
+            }, new { reportId });
+
+            return report;
         }
 
         public async Task<IEnumerable<ReportModel>> GetReportsAsync()
@@ -68,9 +87,16 @@ namespace Shearlegs.Web.Server.Repositories
             const string sql = "INSERT INTO dbo.ReportPlugins (ReportId, Version, Changelog, Content, TemplateContent, TemplateMimeType, TemplateFileName) " +
                 "VALUES (@ReportId, @Version, @Changelog, @Content, @TemplateContent, @TemplateMimeType, @TemplateFileName); SELECT SCOPE_IDENTITY();";
             const string sql1 = "UPDATE dbo.Reports SET PluginId = @Id WHERE Id = @ReportId;";
+            const string sql2 = "INSERT INTO dbo.ReportPluginLibraries (PluginId, Name, Content) VALUES (@PluginId, @Name, @Content);";
 
             reportPluginModel.Id = await connection.ExecuteScalarAsync<int>(sql, reportPluginModel);
             await connection.ExecuteAsync(sql1, reportPluginModel);
+
+            foreach (var library in reportPluginModel.Libraries)
+            {
+                library.PluginId = reportPluginModel.Id;
+                await connection.ExecuteAsync(sql2, library);
+            }
         }
     }
 }

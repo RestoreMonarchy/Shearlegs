@@ -49,7 +49,7 @@ namespace Shearlegs.Web.Server.Controllers
         [HttpGet("{reportId}")]
         public async Task<IActionResult> GetReportAsync(int reportId)
         {
-            return Ok(await reportsRepository.GetReportAsync(reportId));
+            return Ok(await reportsRepository.GetReportPluginAsync(reportId));
         }
 
         [HttpPost("plugin")]
@@ -58,9 +58,6 @@ namespace Shearlegs.Web.Server.Controllers
             await reportsRepository.AddReportPluginAsync(reportPluginModel);
             return Ok(reportPluginModel);
         }
-
-        
-
 
         [HttpGet("archive/{id}/file")]
         public async Task<IActionResult> GetReportArchiveAsync(int id)
@@ -72,7 +69,7 @@ namespace Shearlegs.Web.Server.Controllers
         [HttpPost("{reportId}/execute")]
         public async Task<IActionResult> PostAsync(int reportId)
         {
-            var reportModel = await reportsRepository.GetReportAsync(reportId);
+            var reportModel = await reportsRepository.GetReportPluginAsync(reportId);
             
             string requestBody;
             using (var reader = new StreamReader(Request.Body))
@@ -80,7 +77,8 @@ namespace Shearlegs.Web.Server.Controllers
                 requestBody = await reader.ReadToEndAsync();
             }
 
-            var report = await pluginManager.ExecuteReportPluginAsync(reportModel.Name, requestBody, reportModel.Plugin.Content, Array.Empty<byte[]>());
+            var report = await pluginManager.ExecuteReportPluginAsync(reportModel.Name, requestBody, reportModel.Plugin.Content, 
+                reportModel.Plugin.Libraries.Select(x => x.Content));
 
             var reportArchive = new ReportArchiveModel()
             {

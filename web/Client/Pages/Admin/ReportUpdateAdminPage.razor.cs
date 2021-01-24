@@ -20,7 +20,7 @@ namespace Shearlegs.Web.Client.Pages.Admin
 
         public ReportModel Report { get; set; }
 
-        public ReportPluginModel ReportPluginModel { get; set; } = new ReportPluginModel();
+        public ReportPluginModel ReportPluginModel { get; set; } = new ReportPluginModel() { Libraries = new List<ReportPluginLibraryModel>() };
 
         protected override async Task OnInitializedAsync()
         {
@@ -33,6 +33,21 @@ namespace Shearlegs.Web.Client.Pages.Admin
             await e.File.OpenReadStream().ReadAsync(ReportPluginModel.Content);
         }
 
+        private async Task OnInputLibraryFileChange(InputFileChangeEventArgs e)
+        {
+            Console.WriteLine("hello");
+            foreach (var file in e.GetMultipleFiles())
+            {
+                Console.WriteLine("sup");
+                var library = new ReportPluginLibraryModel();
+                library.Name = file.Name;
+                library.Content = new byte[file.Size];
+                await file.OpenReadStream().ReadAsync(library.Content);
+                ReportPluginModel.Libraries.Add(library);
+            }
+            StateHasChanged();
+        }
+
         private async Task AddPluginReportAsync()
         {
             ReportPluginModel.ReportId = Report.Id; 
@@ -42,7 +57,7 @@ namespace Shearlegs.Web.Client.Pages.Admin
             Report.PluginId = reportPlugin.Id;
             Report.Plugin = reportPlugin;
 
-            ReportPluginModel = new ReportPluginModel();
+            ReportPluginModel = new ReportPluginModel() { Libraries = new List<ReportPluginLibraryModel>() };
         }
     }
 }

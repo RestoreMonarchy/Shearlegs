@@ -17,5 +17,7 @@ namespace Shearlegs.Web.Shared.Models
         public string TemplateMimeType { get; set; }
         public string TemplateFileName { get; set; }
         public DateTime CreateDate { get; set; }
+
+        public List<ReportPluginLibraryModel> Libraries { get; set; }
     }
 }
