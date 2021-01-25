@@ -1,9 +1,11 @@
-﻿using OfficeOpenXml;
+﻿using Dapper;
+using OfficeOpenXml;
 using Shearlegs.API.Logging;
 using Shearlegs.API.Plugins;
 using Shearlegs.API.Reports;
 using Shearlegs.Core.Reports;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -41,13 +43,16 @@ namespace SamplePlugin
                 MimeType = template.MimeType
             };
 
+            var conn = new SqlConnection("Data Source=localhost;Integrated Security=True;Database=Shearlegs;");
+            var reports = await conn.QueryAsync<string>("SELECT Name FROM dbo.Reports;");
+
             using (var ms = new MemoryStream(template.Data))
             {
                 using (var package = new ExcelPackage(ms))
                 {
                     var shit = package.Workbook.Worksheets["shit"];
 
-                    shit.Cells[2, 2].Value = "simeakdmsoadioqdisjoidja";
+                    shit.Cells.LoadFromCollection(reports);
 
                     report.Data = await package.GetAsByteArrayAsync();
                 }
