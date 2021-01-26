@@ -32,9 +32,48 @@ namespace Shearlegs.Web.Server.Repositories
 
         public async Task<ReportModel> GetReportAsync(int id)
         {
-            const string sql = "SELECT * FROM dbo.Reports WHERE Id = @id;";
+            const string sql = "SELECT r.*, p.* FROM dbo.Reports r LEFT JOIN dbo.ReportParameters p ON r.Id = p.ReportId WHERE r.Id = @id;";
 
-            return await connection.QuerySingleOrDefaultAsync<ReportModel>(sql, new { id });
+            ReportModel report = null;
+            await connection.QueryAsync<ReportModel, ReportParameterModel, ReportModel>(sql, (r, p) => 
+            { 
+                if (report == null)
+                {
+                    report = r;
+                    report.Parameters = new List<ReportParameterModel>();
+                }
+
+                if (p != null)
+                    report.Parameters.Add(p);
+                return null;
+            }, new { id });
+
+            return report;
+        }
+
+        public async Task<IEnumerable<ReportModel>> GetReportsAsync()
+        {
+            const string sql = "SELECT r.*, p.* FROM dbo.Reports r LEFT JOIN dbo.ReportParameters p ON r.Id = p.ReportId;";
+
+            List<ReportModel> reports = new List<ReportModel>();
+
+            await connection.QueryAsync<ReportModel, ReportParameterModel, ReportModel>(sql, (r, p) => 
+            {
+                var report = reports.FirstOrDefault(x => x.Id == r.Id);
+                if (report == null)
+                {
+                    report = r;
+                    report.Parameters = new List<ReportParameterModel>();
+                    reports.Add(report);
+                }
+
+                if (p != null)
+                    report.Parameters.Add(p);
+
+                return null;
+            });
+
+            return reports;
         }
 
         public async Task<ReportModel> GetReportPluginAsync(int reportId)
@@ -62,11 +101,7 @@ namespace Shearlegs.Web.Server.Repositories
             return report;
         }
 
-        public async Task<IEnumerable<ReportModel>> GetReportsAsync()
-        {
-            const string sql = "SELECT * FROM dbo.Reports;";
-            return await connection.QueryAsync<ReportModel>(sql);
-        }
+        
 
         public async Task AddReportAsync(ReportModel reportModel)
         {

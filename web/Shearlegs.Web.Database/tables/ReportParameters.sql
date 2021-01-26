@@ -1,0 +1,8 @@
+﻿CREATE TABLE dbo.ReportParameters
+(
+	Id INT IDENTITY(1, 1) NOT NULL CONSTRAINT PK_ReportParameters PRIMARY KEY,
+	ReportId INT CONSTRAINT FK_ReportParameters_ReportId FOREIGN KEY REFERENCES dbo.Reports(Id),
+	Name NVARCHAR(255) NOT NULL,
+	InputType VARCHAR(255) NOT NULL,
+	IsMandatory BIT NOT NULL
+);

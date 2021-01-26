@@ -14,6 +14,7 @@ namespace Shearlegs.Web.Shared.Models
         public int PluginId { get; set; }
         public bool Enabled { get; set; }
 
+        public List<ReportParameterModel> Parameters { get; set; }
         public ReportPluginModel Plugin { get; set; }
     }
 }
