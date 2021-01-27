@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using Shearlegs.Web.Client.Extensions;
 using Shearlegs.Web.Shared.Models;
 using System;
 using System.Collections.Generic;
@@ -13,6 +15,8 @@ namespace Shearlegs.Web.Client.Pages
     {
         [Inject]
         public HttpClient HttpClient { get; set; }
+        [Inject]
+        public IJSRuntime JsRuntime { get; set; }
 
         [Parameter]
         public int ReportId { get; set; }
@@ -25,11 +29,12 @@ namespace Shearlegs.Web.Client.Pages
             Report = await HttpClient.GetFromJsonAsync<ReportModel>("api/reports/" + ReportId);
         }
 
-        private string json;
         private ReportArchiveModel reportArchive;
 
         public async Task GenerateReportAsync()
         {
+            string json = await JsRuntime.GetFormDataJsonAsync("reportParameters");
+            Console.WriteLine(json);
             var response = await HttpClient.PostAsync($"api/reports/{Report.Id}/execute", new StringContent(json));
             reportArchive = await response.Content.ReadFromJsonAsync<ReportArchiveModel>();
         }

@@ -3,14 +3,20 @@
 @if (Report != null)
 {
     <div class="bg-light mt-3 p-4">
-        <h1>Generate @Report.Name Report</h1>
-        <p class="text-muted">@Report.Description</p>
-        <div class="form-floating mt-3">
-            <input type="" />
-            <textarea class="form-control" style="height: 300px;" @bind="json" />
-            <label>Report Parameters (json)</label>
+        <div class="mb-3"> 
+            <h1>Generate @Report.Name Report</h1>
+            <p class="text-muted">@Report.Description</p>
         </div>
-
+        
+        <form name="reportParameters">
+            @foreach (var parameter in Report.Parameters)
+            {
+                <div class="mb-3">
+                    <label class="form-label">@parameter.Name</label>
+                    <input type="@parameter.InputType" name="@parameter.Name" class="form-control">
+                </div>
+            }
+        </form>
         <button class="btn btn-primary mt-3" @onclick="GenerateReportAsync">Generate Report</button>
     </div>
 

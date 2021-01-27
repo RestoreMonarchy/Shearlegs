@@ -22,5 +22,10 @@ namespace Shearlegs.Web.Client.Extensions
         {
             await jsRuntime.InvokeVoidAsync("HideModal", modalId);
         }
+
+        public static async Task<string> GetFormDataJsonAsync(this IJSRuntime jsRuntime, string formName)
+        {
+            return await jsRuntime.InvokeAsync<string>("GetFormDataJson", formName);
+        }
     }
 }
