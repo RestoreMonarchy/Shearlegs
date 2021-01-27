@@ -45,7 +45,7 @@
     [Parameter]
     public EModalSize ModalSize { get; set; }
 
-    private bool isUpdate;
+    public bool IsUpdate { get; private set; }
 
     public T Model { get; private set; }
 
@@ -73,20 +73,20 @@
     public async Task CreateAsync()
     {
         Model = ModelFactory.Invoke();
-        isUpdate = false;
+        IsUpdate = false;
         await JSRuntime.ShowModalStaticAsync(ModalName);
     }
 
     public async Task UpdateAsync(T model)
     {
         Model = model;
-        isUpdate = true;
+        IsUpdate = true;
         await JSRuntime.ShowModalStaticAsync(ModalName);
     }
 
     private async Task SubmitAsync()
     {
-        if (!isUpdate)
+        if (!IsUpdate)
             await OnCreated.InvokeAsync(Model);
         else
             await OnUpdated.InvokeAsync(Model);

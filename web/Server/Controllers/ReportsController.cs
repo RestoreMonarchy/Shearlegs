@@ -50,7 +50,20 @@ namespace Shearlegs.Web.Server.Controllers
         [HttpGet("{reportId}")]
         public async Task<IActionResult> GetReportAsync(int reportId)
         {
-            return Ok(await reportsRepository.GetReportPluginAsync(reportId));
+            return Ok(await reportsRepository.GetReportAsync(reportId));
+        }
+
+        [HttpPost("parameters")]
+        public async Task<IActionResult> PostReportParameterAsync([FromBody] ReportParameterModel reportParameter)
+        {
+            return Ok(await reportsRepository.AddReportParameterAsync(reportParameter));
+        }
+
+        [HttpDelete("parameters/{reportParameterId}")]
+        public async Task<IActionResult> DeleteReportParameterAsync(int reportParameterId)
+        {
+            await reportsRepository.RemoveReportParameterAsync(reportParameterId);
+            return Ok();
         }
 
         [HttpPost("plugin")]

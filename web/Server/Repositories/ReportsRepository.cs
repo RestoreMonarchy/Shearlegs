@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Shearlegs.Web.Shared.Models;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -33,6 +34,7 @@ namespace Shearlegs.Web.Server.Repositories
         public async Task<ReportModel> GetReportAsync(int id)
         {
             const string sql = "SELECT r.*, p.* FROM dbo.Reports r LEFT JOIN dbo.ReportParameters p ON r.Id = p.ReportId WHERE r.Id = @id;";
+            const string sql1 = "SELECT Id, Version, Changelog, CreateDate FROM dbo.ReportPlugins WHERE Id = @PluginId;";
 
             ReportModel report = null;
             await connection.QueryAsync<ReportModel, ReportParameterModel, ReportModel>(sql, (r, p) => 
@@ -48,7 +50,26 @@ namespace Shearlegs.Web.Server.Repositories
                 return null;
             }, new { id });
 
+            if (report.PluginId != 0)
+                report.Plugin = await connection.QuerySingleOrDefaultAsync<ReportPluginModel>(sql1, report);
+
             return report;
+        }
+
+        public async Task<ReportParameterModel> AddReportParameterAsync(ReportParameterModel reportParameter)
+        {
+            const string sql = "INSERT INTO dbo.ReportParameters (ReportId, Name, InputType, IsMandatory) " +
+                "OUTPUT INSERTED.Id, INSERTED.ReportId, INSERTED.Name, INSERTED.InputType, INSERTED.IsMandatory " +
+                "VALUES (@ReportId, @Name, @InputType, @IsMandatory);";
+
+            return await connection.QuerySingleOrDefaultAsync<ReportParameterModel>(sql, reportParameter);
+        }
+
+        public async Task RemoveReportParameterAsync(int reportParameterId)
+        {
+            const string sql = "DELETE FROM dbo.ReportParameters WHERE Id = @reportParameterId;";
+
+            await connection.ExecuteAsync(sql, new { reportParameterId });
         }
 
         public async Task<IEnumerable<ReportModel>> GetReportsAsync()
