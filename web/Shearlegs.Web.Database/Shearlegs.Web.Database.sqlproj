@@ -60,9 +60,11 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="tables\ReportsArchive.sql" />
-    <Build Include="tables\ReportPlugins.sql" />
+    <Build Include="tables\ReportBranchPlugins.sql" />
     <Build Include="tables\Reports.sql" />
-    <Build Include="tables\ReportParameters.sql" />
+    <Build Include="tables\ReportBranchParameters.sql" />
+    <Build Include="tables\ReportBranches.sql" />
+    <Build Include="tables\ReportBranchPluginLibraries.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shearlegs_1.Web.Database.publish.xml" />

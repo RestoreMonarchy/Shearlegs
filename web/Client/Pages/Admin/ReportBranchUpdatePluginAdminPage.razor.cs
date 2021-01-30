@@ -1,16 +1,16 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components;
 using Shearlegs.Web.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
+using System.Net.Http.Json;
 
 namespace Shearlegs.Web.Client.Pages.Admin
 {
-    public partial class ReportUpdateAdminPage
+    public partial class ReportBranchUpdatePluginAdminPage
     {
         [Inject]
         public HttpClient HttpClient { get; set; }
@@ -20,7 +20,8 @@ namespace Shearlegs.Web.Client.Pages.Admin
 
         public ReportBranchModel Branch { get; set; }
 
-        public ReportBranchPluginModel PluginModel { get; set; } = new ReportBranchPluginModel() { Libraries = new List<ReportBranchPluginLibraryModel>() };
+        public ReportBranchPluginModel PluginModel { get; set; } 
+            = new ReportBranchPluginModel() { Libraries = new List<ReportBranchPluginLibraryModel>() };
 
         protected override async Task OnInitializedAsync()
         {
@@ -57,7 +58,7 @@ namespace Shearlegs.Web.Client.Pages.Admin
 
         private async Task AddPluginReportAsync()
         {
-            PluginModel.BranchId = Branch.Id; 
+            PluginModel.BranchId = Branch.Id;
             var response = await HttpClient.PostAsJsonAsync("api/reports/plugin", PluginModel);
             var reportPlugin = await response.Content.ReadFromJsonAsync<ReportBranchPluginModel>();
 

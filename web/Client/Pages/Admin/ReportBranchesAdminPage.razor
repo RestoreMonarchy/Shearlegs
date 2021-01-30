@@ -1,0 +1,93 @@
+﻿@page "/admin/reportbranches/{ReportId:int}"
+
+@if (Report != null)
+{
+    <div class="mt-5 mb-3">
+        <h1 class="">Manage @Report.Name Branches</h1>
+    </div>
+
+    <div class="mb-3">
+        <select class="form-select" @onchange="OnChangeBranchAsync">
+            @foreach (var branch in Report.Branches)
+            {
+                <option value="@branch.Id">@branch.Name</option>
+            }
+        </select>
+    </div>
+
+
+    @if (Branch != null)
+    {
+        <div class="mb-3">
+            <a class="btn btn-primary" href="/admin/reports/branches/@Branch.Id/update">Update Plugin</a>
+            @if (Branch.Plugin == null)
+            {
+                <p>There isn't any plugin for this branch</p>
+            }
+            else
+            {
+                <ul>
+                    <li>Current Version: @Branch.Plugin.Version</li>
+                    <li>Changelog: @Branch.Plugin.Changelog</li>
+                </ul>
+            }
+        </div>        
+
+        <div class="mb-3 bg-white p-3">
+            <form class="row g-4">
+                <div class="col-auto">
+                    <input type="text" class="form-control" @bind="Parameter.Name">
+                </div>
+                <div class="col-auto">
+                    <select class="form-select" @bind="Parameter.InputType">
+                        <option value="checkbox">checkbox</option>
+                        <option value="date">date</option>
+                        <option value="text">text</option>
+                        <option value="number">number</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" @bind="Parameter.IsMandatory">
+                        <label class="form-check-label">
+                            Is Mandatory
+                        </label>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <a href="javascript:void(0)" class="btn btn-primary mb-3" @onclick="AddParameterAsync">Add</a>
+                </div>
+            </form>
+
+            <div class="mb-3">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Input Type</th>
+                            <th>Is Mandatory</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var parameter in Branch.Parameters)
+                        {
+                            <tr>
+                                <td>@parameter.Name</td>
+                                <td>@parameter.InputType</td>
+                                <td>@parameter.IsMandatory</td>
+                                <td>
+                                    <a href="javascript:void(0)" class="btn btn-danger" @onclick="() => RemoveParameterAsync(parameter)">Remove</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+
+        
+    }
+}

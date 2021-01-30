@@ -34,30 +34,9 @@ namespace Shearlegs.Web.Client.Pages.Admin
         {
             await HttpClient.PutAsJsonAsync("api/reports", report);
         }
-
-        public ReportParameterModel ReportParameter { get; set; } = new ReportParameterModel();
-
-        public async Task AddParameterAsync()
-        {
-            var response = await HttpClient.PostAsJsonAsync("api/reports/parameters", ReportParameter);
-            ReportParameter = await response.Content.ReadFromJsonAsync<ReportParameterModel>();
-            Modal.Model.Parameters.Add(ReportParameter);
-            ReportParameter = new ReportParameterModel() { InputType = "text" };
-        }
-
-        public async Task RemoveParameterAsync(ReportParameterModel reportParameter)
-        {
-            await HttpClient.DeleteAsync("api/reports/parameters/" + reportParameter.Id);
-            Modal.Model.Parameters.Remove(reportParameter);
-        }
-
+        
         private async Task EditReportAsync(ReportModel report)
         {
-            ReportParameter = new ReportParameterModel()
-            {
-                ReportId = report.Id,
-                InputType = "text"
-            };
             await Modal.UpdateAsync(report);
         } 
         private async Task AddReportAsync() => await Modal.CreateAsync();

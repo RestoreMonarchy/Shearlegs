@@ -31,65 +31,89 @@ namespace Shearlegs.Web.Server.Repositories
             return await connection.QuerySingleOrDefaultAsync<ReportArchiveModel>(sql, new { id });
         }
 
+        public async Task<ReportBranchModel> GetReportBranchAsync(int id)
+        {
+            const string sql = "SELECT b.*, p.* FROM dbo.ReportBranches b " +
+                "LEFT JOIN dbo.ReportBranchParameters p ON b.Id = p.BranchId WHERE b.Id = @id;";
+            const string sql1 = "SELECT Id, Version, Changelog, CreateDate FROM dbo.ReportBranchPlugins WHERE Id = @PluginId;";
+
+            ReportBranchModel branch = null;
+            await connection.QueryAsync<ReportBranchModel, ReportBranchParameterModel, ReportBranchModel>(sql, (b, p) =>
+            {
+                if (branch == null)
+                {
+                    branch = b;
+                    branch.Parameters = new List<ReportBranchParameterModel>();
+                }
+
+                if (p != null)
+                    branch.Parameters.Add(p);
+
+                return null;
+            }, new { id });
+
+            if (branch.PluginId != 0)
+                branch.Plugin = await connection.QuerySingleOrDefaultAsync<ReportBranchPluginModel>(sql1, branch);
+
+            return branch;
+        }
+
         public async Task<ReportModel> GetReportAsync(int id)
         {
-            const string sql = "SELECT r.*, p.* FROM dbo.Reports r LEFT JOIN dbo.ReportParameters p ON r.Id = p.ReportId WHERE r.Id = @id;";
-            const string sql1 = "SELECT Id, Version, Changelog, CreateDate FROM dbo.ReportPlugins WHERE Id = @PluginId;";
+            const string sql = "SELECT r.*, b.* FROM dbo.Reports r LEFT JOIN dbo.ReportBranches b ON r.Id = b.ReportId WHERE r.Id = @id;";
 
             ReportModel report = null;
-            await connection.QueryAsync<ReportModel, ReportParameterModel, ReportModel>(sql, (r, p) => 
+            await connection.QueryAsync<ReportModel, ReportBranchModel, ReportModel>(sql, (r, b) => 
             { 
                 if (report == null)
                 {
                     report = r;
-                    report.Parameters = new List<ReportParameterModel>();
+                    report.Branches = new List<ReportBranchModel>();
                 }
 
-                if (p != null)
-                    report.Parameters.Add(p);
+                if (b != null)
+                    report.Branches.Add(b);
+
                 return null;
             }, new { id });
-
-            if (report.PluginId != 0)
-                report.Plugin = await connection.QuerySingleOrDefaultAsync<ReportPluginModel>(sql1, report);
 
             return report;
         }
 
-        public async Task<ReportParameterModel> AddReportParameterAsync(ReportParameterModel reportParameter)
+        public async Task<ReportBranchParameterModel> AddReportBranchParameterAsync(ReportBranchParameterModel reportParameter)
         {
-            const string sql = "INSERT INTO dbo.ReportParameters (ReportId, Name, InputType, IsMandatory) " +
-                "OUTPUT INSERTED.Id, INSERTED.ReportId, INSERTED.Name, INSERTED.InputType, INSERTED.IsMandatory " +
-                "VALUES (@ReportId, @Name, @InputType, @IsMandatory);";
+            const string sql = "INSERT INTO dbo.ReportBranchParameters (BranchId, Name, InputType, IsMandatory) " +
+                "OUTPUT INSERTED.Id, INSERTED.BranchId, INSERTED.Name, INSERTED.InputType, INSERTED.IsMandatory " +
+                "VALUES (@BranchId, @Name, @InputType, @IsMandatory);";
 
-            return await connection.QuerySingleOrDefaultAsync<ReportParameterModel>(sql, reportParameter);
+            return await connection.QuerySingleOrDefaultAsync<ReportBranchParameterModel>(sql, reportParameter);
         }
 
-        public async Task RemoveReportParameterAsync(int reportParameterId)
+        public async Task RemoveReportBranchParameterAsync(int parameterId)
         {
-            const string sql = "DELETE FROM dbo.ReportParameters WHERE Id = @reportParameterId;";
+            const string sql = "DELETE FROM dbo.ReportBranchParameters WHERE Id = @parameterId;";
 
-            await connection.ExecuteAsync(sql, new { reportParameterId });
+            await connection.ExecuteAsync(sql, new { parameterId });
         }
 
         public async Task<IEnumerable<ReportModel>> GetReportsAsync()
         {
-            const string sql = "SELECT r.*, p.* FROM dbo.Reports r LEFT JOIN dbo.ReportParameters p ON r.Id = p.ReportId;";
+            const string sql = "SELECT r.*, b.* FROM dbo.Reports r LEFT JOIN dbo.ReportBranches b ON r.Id = b.ReportId;";
 
             List<ReportModel> reports = new List<ReportModel>();
 
-            await connection.QueryAsync<ReportModel, ReportParameterModel, ReportModel>(sql, (r, p) => 
+            await connection.QueryAsync<ReportModel, ReportBranchModel, ReportModel>(sql, (r, b) => 
             {
                 var report = reports.FirstOrDefault(x => x.Id == r.Id);
                 if (report == null)
                 {
                     report = r;
-                    report.Parameters = new List<ReportParameterModel>();
+                    report.Branches = new List<ReportBranchModel>();
                     reports.Add(report);
                 }
 
-                if (p != null)
-                    report.Parameters.Add(p);
+                if (b != null)
+                    report.Branches.Add(b);
 
                 return null;
             });
@@ -97,37 +121,34 @@ namespace Shearlegs.Web.Server.Repositories
             return reports;
         }
 
-        public async Task<ReportModel> GetReportPluginAsync(int reportId)
+        public async Task<ReportBranchModel> GetReportPluginAsync(int branchId)
         {
-            const string sql = "SELECT r.*, p.*, l.* FROM dbo.Reports r LEFT JOIN dbo.ReportPlugins p ON r.PluginId = p.Id " +
-                "LEFT JOIN dbo.ReportPluginLibraries l ON l.PluginId = p.Id WHERE r.Id = @reportId;";
+            const string sql = "SELECT b.*, r.*, p.* FROM dbo.ReportBranches b JOIN dbo.Reports r ON b.ReportId = r.Id " +
+                "LEFT JOIN dbo.ReportBranchPlugins p ON b.PluginId = p.Id WHERE b.Id = @branchId;";
 
-            ReportModel report = null;
+            const string sql1 = "SELECT * FROM dbo.ReportBranchPluginLibraries WHERE PluginId = @Id;";
 
-            await connection.QueryAsync<ReportModel, ReportPluginModel, ReportPluginLibraryModel, ReportModel>(sql, (r, p, l) => 
+            var branch = (await connection.QueryAsync<ReportBranchModel, ReportModel, ReportBranchPluginModel, ReportBranchModel>(sql, (b, r, p) =>
             {
-                if (report == null)
-                {
-                    report = r;
-                    report.Plugin = p;
-                    report.Plugin.Libraries = new List<ReportPluginLibraryModel>();
-                }
+                b.Report = r;
+                b.Plugin = p;
+                return b;
+            }, new { branchId })).FirstOrDefault();
 
-                if (l != null)
-                    report.Plugin.Libraries.Add(l);
+            if (branch.Plugin != null)
+                branch.Plugin.Libraries = (await connection.QueryAsync<ReportBranchPluginLibraryModel>(sql1, branch.Plugin)).ToList();
 
-                return null;
-            }, new { reportId });
-
-            return report;
-        }
-
-        
+            return branch;
+        }        
 
         public async Task AddReportAsync(ReportModel reportModel)
         {
             const string sql = "INSERT INTO dbo.Reports (Name, Description, Enabled) " +
-                "VALUES (@Name, @Description, @Enabled); SELECT SCOPE_IDENTITY();";
+                "OUTPUT INSERTED.Id " +
+                "VALUES (@Name, @Description, @Enabled); " +
+                "INSERT INTO dbo.ReportBranches (ReportId, Name, Description) " +
+                "VALUES (SCOPE_IDENTITY(), 'PRODUCTION', 'Production environment branch');";
+
             reportModel.Id = await connection.ExecuteScalarAsync<int>(sql, reportModel);
         }
 
@@ -137,20 +158,20 @@ namespace Shearlegs.Web.Server.Repositories
                 "WHERE Id = @Id;";
             await connection.ExecuteAsync(sql, reportModel);
         }
-
-        public async Task AddReportPluginAsync(ReportPluginModel reportPluginModel)
+        
+        public async Task AddReportBranchPluginAsync(ReportBranchPluginModel reportBranchPluginModel)
         {
-            const string sql = "INSERT INTO dbo.ReportPlugins (ReportId, Version, Changelog, Content, TemplateContent, TemplateMimeType, TemplateFileName) " +
-                "VALUES (@ReportId, @Version, @Changelog, @Content, @TemplateContent, @TemplateMimeType, @TemplateFileName); SELECT SCOPE_IDENTITY();";
-            const string sql1 = "UPDATE dbo.Reports SET PluginId = @Id WHERE Id = @ReportId;";
-            const string sql2 = "INSERT INTO dbo.ReportPluginLibraries (PluginId, Name, Content) VALUES (@PluginId, @Name, @Content);";
+            const string sql = "INSERT INTO dbo.ReportBranchPlugins (BranchId, Version, Changelog, Content, TemplateContent, TemplateMimeType, TemplateFileName) " +
+                "VALUES (@BranchId, @Version, @Changelog, @Content, @TemplateContent, @TemplateMimeType, @TemplateFileName); SELECT SCOPE_IDENTITY();";
+            const string sql1 = "UPDATE dbo.ReportBranches SET PluginId = @Id WHERE Id = @BranchId;";
+            const string sql2 = "INSERT INTO dbo.ReportBranchPluginLibraries (PluginId, Name, Content) VALUES (@PluginId, @Name, @Content);";
 
-            reportPluginModel.Id = await connection.ExecuteScalarAsync<int>(sql, reportPluginModel);
-            await connection.ExecuteAsync(sql1, reportPluginModel);
+            reportBranchPluginModel.Id = await connection.ExecuteScalarAsync<int>(sql, reportBranchPluginModel);
+            await connection.ExecuteAsync(sql1, reportBranchPluginModel);
 
-            foreach (var library in reportPluginModel.Libraries)
+            foreach (var library in reportBranchPluginModel.Libraries)
             {
-                library.PluginId = reportPluginModel.Id;
+                library.PluginId = reportBranchPluginModel.Id;
                 await connection.ExecuteAsync(sql2, library);
             }
         }

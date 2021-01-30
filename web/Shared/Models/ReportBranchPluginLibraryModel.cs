@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace Shearlegs.Web.Shared.Models
 {
-    public class ReportParameterModel
+    public class ReportBranchPluginLibraryModel
     {
         public int Id { get; set; }
-        public int ReportId { get; set; }
+        public int PluginId { get; set; }
         public string Name { get; set; }
-        public string InputType { get; set; }
-        public bool IsMandatory { get; set; }
+        public byte[] Content { get; set; }
     }
 }

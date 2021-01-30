@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using Shearlegs.Web.Client.Extensions;
 using Shearlegs.Web.Shared.Models;
 using System;
 using System.Collections.Generic;
@@ -9,14 +7,12 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-namespace Shearlegs.Web.Client.Pages
+namespace Shearlegs.Web.Client.Pages.Admin
 {
-    public partial class ReportGeneratePage
+    public partial class ReportBranchesAdminPage
     {
         [Inject]
         public HttpClient HttpClient { get; set; }
-        [Inject]
-        public IJSRuntime JsRuntime { get; set; }
 
         [Parameter]
         public int ReportId { get; set; }
@@ -26,10 +22,11 @@ namespace Shearlegs.Web.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            Console.WriteLine(ReportId);
             Report = await HttpClient.GetFromJsonAsync<ReportModel>("api/reports/" + ReportId);
             await ReloadBranchAsync(Report.Branches.FirstOrDefault()?.Id ?? 0);
         }
+
+        public ReportBranchParameterModel Parameter { get; set; }
 
         private async Task OnChangeBranchAsync(ChangeEventArgs e)
         {
@@ -37,7 +34,7 @@ namespace Shearlegs.Web.Client.Pages
         }
 
         private async Task ReloadBranchAsync(int branchId)
-        {
+        {            
             if (branchId == 0)
             {
                 Branch = null;
@@ -45,16 +42,25 @@ namespace Shearlegs.Web.Client.Pages
             }
 
             Branch = await HttpClient.GetFromJsonAsync<ReportBranchModel>("api/reports/branches/" + branchId);
+            Parameter = new ReportBranchParameterModel()
+            {
+                BranchId = Branch.Id,
+                InputType = "text"
+            };
         }
 
-        private ReportArchiveModel reportArchive;
-
-        public async Task GenerateReportAsync()
+        public async Task AddParameterAsync()
         {
-            string json = await JsRuntime.GetFormDataJsonAsync("reportParameters");
-            Console.WriteLine(json);
-            var response = await HttpClient.PostAsync($"api/reports/{Branch.Id}/execute", new StringContent(json));
-            reportArchive = await response.Content.ReadFromJsonAsync<ReportArchiveModel>();
+            var response = await HttpClient.PostAsJsonAsync("api/reports/parameters", Parameter);
+            Parameter = await response.Content.ReadFromJsonAsync<ReportBranchParameterModel>();
+            Branch.Parameters.Add(Parameter);
+            Parameter = new ReportBranchParameterModel() { BranchId = Branch.Id, InputType = "text" };
+        }
+
+        public async Task RemoveParameterAsync(ReportBranchParameterModel parameter)
+        {
+            await HttpClient.DeleteAsync("api/reports/parameters/" + parameter.Id);
+            Branch.Parameters.Remove(parameter);
         }
     }
 }

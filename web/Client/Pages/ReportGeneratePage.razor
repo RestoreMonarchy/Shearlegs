@@ -3,27 +3,45 @@
 @if (Report != null)
 {
     <div class="bg-light mt-3 p-4">
-        <div class="mb-3"> 
+        <div class="mb-3">
             <h1>Generate @Report.Name Report</h1>
             <p class="text-muted">@Report.Description</p>
         </div>
-        
-        <form name="reportParameters">
-            @foreach (var parameter in Report.Parameters)
-            {
-                <div class="mb-3">
-                    <label class="form-label">@parameter.Name</label>
-                    <input type="@parameter.InputType" name="@parameter.Name" class="form-control">
-                </div>
-            }
-        </form>
-        <button class="btn btn-primary mt-3" @onclick="GenerateReportAsync">Generate Report</button>
-    </div>
 
-    <div class="mt-5">
-        @if (reportArchive != null)
+        <div class="mb-3">
+            <select class="form-select" @onchange="OnChangeBranchAsync">
+                @foreach (var branch in Report.Branches)
+                {
+                    <option value="@branch.Id">@branch.Name</option>
+                }
+            </select>
+        </div>
+
+        @if (Branch != null)
         {
-            <a class="btn btn-primary" href="/api/reports/archive/@reportArchive.Id/file">Download @reportArchive.Name</a>
+            <div class="mb-3">
+                <h3>Branch: @Branch.Name</h3>
+                <p>Description: <span class="text-muted">@Branch.Description</span></p>
+            </div>            
+
+            <form name="reportParameters">
+                @foreach (var parameter in Branch.Parameters)
+                {
+                    <div class="mb-3">
+                        <label class="form-label">@parameter.Name</label>
+                        <input type="@parameter.InputType" name="@parameter.Name" class="form-control">
+                    </div>
+                }
+            </form>
+            <button class="btn btn-primary mt-3" @onclick="GenerateReportAsync">Generate Report</button>
+
+
+            <div class="mt-5">
+                @if (reportArchive != null)
+                {
+                    <a class="btn btn-primary" href="/api/reports/archive/@reportArchive.Id/file">Download @reportArchive.Name</a>
+                }
+            </div>
         }
     </div>
 }

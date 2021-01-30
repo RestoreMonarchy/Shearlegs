@@ -53,23 +53,29 @@ namespace Shearlegs.Web.Server.Controllers
             return Ok(await reportsRepository.GetReportAsync(reportId));
         }
 
-        [HttpPost("parameters")]
-        public async Task<IActionResult> PostReportParameterAsync([FromBody] ReportParameterModel reportParameter)
+        [HttpGet("branches/{branchId}")]
+        public async Task<IActionResult> GetReportBranchAsync(int branchId)
         {
-            return Ok(await reportsRepository.AddReportParameterAsync(reportParameter));
+            return Ok(await reportsRepository.GetReportBranchAsync(branchId));
+        }
+
+        [HttpPost("parameters")]
+        public async Task<IActionResult> PostReportParameterAsync([FromBody] ReportBranchParameterModel reportParameter)
+        {
+            return Ok(await reportsRepository.AddReportBranchParameterAsync(reportParameter));
         }
 
         [HttpDelete("parameters/{reportParameterId}")]
         public async Task<IActionResult> DeleteReportParameterAsync(int reportParameterId)
         {
-            await reportsRepository.RemoveReportParameterAsync(reportParameterId);
+            await reportsRepository.RemoveReportBranchParameterAsync(reportParameterId);
             return Ok();
         }
 
         [HttpPost("plugin")]
-        public async Task<IActionResult> PostPluginAsync([FromBody] ReportPluginModel reportPluginModel)
+        public async Task<IActionResult> PostPluginAsync([FromBody] ReportBranchPluginModel reportPluginModel)
         {
-            await reportsRepository.AddReportPluginAsync(reportPluginModel);
+            await reportsRepository.AddReportBranchPluginAsync(reportPluginModel);
             return Ok(reportPluginModel);
         }
 
@@ -80,10 +86,10 @@ namespace Shearlegs.Web.Server.Controllers
             return File(reportArchive.Content, reportArchive.MimeType, reportArchive.Name);
         }
 
-        [HttpPost("{reportId}/execute")]
-        public async Task<IActionResult> PostAsync(int reportId)
+        [HttpPost("{branchId}/execute")]
+        public async Task<IActionResult> PostAsync(int branchId)
         {
-            var reportModel = await reportsRepository.GetReportPluginAsync(reportId);
+            var branchModel = await reportsRepository.GetReportPluginAsync(branchId);
             
             string requestBody;
             using (var reader = new StreamReader(Request.Body))
@@ -93,18 +99,18 @@ namespace Shearlegs.Web.Server.Controllers
 
             ITemplate template = null;
 
-            if (reportModel.Plugin.TemplateContent != null)
+            if (branchModel.Plugin.TemplateContent != null)
             {
                 template = new Template()
                 {
-                    Data = reportModel.Plugin.TemplateContent,
-                    MimeType = reportModel.Plugin.TemplateMimeType,
-                    FileName = reportModel.Plugin.TemplateFileName
+                    Data = branchModel.Plugin.TemplateContent,
+                    MimeType = branchModel.Plugin.TemplateMimeType,
+                    FileName = branchModel.Plugin.TemplateFileName
                 };
             }
 
-            var report = await pluginManager.ExecuteReportPluginAsync(reportModel.Name, requestBody, reportModel.Plugin.Content, 
-                template, reportModel.Plugin.Libraries.Select(x => x.Content));
+            var report = await pluginManager.ExecuteReportPluginAsync(branchModel.Report.Name, requestBody, branchModel.Plugin.Content, 
+                template, branchModel.Plugin.Libraries.Select(x => x.Content));
 
             var reportArchive = new ReportArchiveModel()
             {
