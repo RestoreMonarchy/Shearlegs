@@ -31,6 +31,22 @@ namespace Shearlegs.Web.Server.Repositories
             return await connection.QuerySingleOrDefaultAsync<ReportArchiveModel>(sql, new { id });
         }
 
+        public async Task UpdateReportBranchAsync(ReportBranchModel branch)
+        {
+            const string sql = "UPDATE dbo.ReportBranches SET Name = @Name, Description = @Description WHERE Id = @Id;";
+
+            await connection.ExecuteAsync(sql, branch);
+        }
+
+        public async Task<ReportBranchModel> AddReportBranchAsync(ReportBranchModel branch)
+        {
+            const string sql = "INSERT INTO dbo.ReportBranches (ReportId, Name, Description) " +
+                "OUTPUT INSERTED.Id, INSERTED.ReportId, INSERTED.Name, INSERTED.Description, INSERTED.PluginId " +
+                "VALUES (@ReportId, @Name, @Description);";
+
+            return await connection.QuerySingleOrDefaultAsync<ReportBranchModel>(sql, branch);
+        }
+
         public async Task<ReportBranchModel> GetReportBranchAsync(int id)
         {
             const string sql = "SELECT b.*, p.* FROM dbo.ReportBranches b " +

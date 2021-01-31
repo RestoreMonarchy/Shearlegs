@@ -27,6 +27,19 @@ namespace Shearlegs.Web.Server.Controllers
             this.reportsRepository = reportsRepository;
         }
 
+        [HttpPost("branches")]
+        public async Task<IActionResult> PostBranchAsync([FromBody] ReportBranchModel branch)
+        {
+            return Ok(await reportsRepository.AddReportBranchAsync(branch));
+        }
+
+        [HttpPut("branches")]
+        public async Task<IActionResult> PutBranchAsync([FromBody] ReportBranchModel branch)
+        {
+            await reportsRepository.UpdateReportBranchAsync(branch);
+            return Ok();
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetReportsAsync()
         {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Shearlegs.Web.Client.Shared.Components;
 using Shearlegs.Web.Shared.Models;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,8 @@ namespace Shearlegs.Web.Client.Pages.Admin
         public ReportModel Report { get; set; }
         public ReportBranchModel Branch { get; set; }
 
+        public Modal<ReportBranchModel> Modal { get; set; }
+
         protected override async Task OnInitializedAsync()
         {
             Report = await HttpClient.GetFromJsonAsync<ReportModel>("api/reports/" + ReportId);
@@ -30,7 +33,7 @@ namespace Shearlegs.Web.Client.Pages.Admin
 
         private async Task OnChangeBranchAsync(ChangeEventArgs e)
         {
-            await ReloadBranchAsync((int)e.Value);
+            await ReloadBranchAsync(int.Parse(e.Value.ToString()));
         }
 
         private async Task ReloadBranchAsync(int branchId)
@@ -62,5 +65,22 @@ namespace Shearlegs.Web.Client.Pages.Admin
             await HttpClient.DeleteAsync("api/reports/parameters/" + parameter.Id);
             Branch.Parameters.Remove(parameter);
         }
+
+        private async Task PostReportBranchAsync(ReportBranchModel branch)
+        {
+            var response = await HttpClient.PostAsJsonAsync("api/reports/branches", branch);
+            Report.Branches.Add(await response.Content.ReadFromJsonAsync<ReportBranchModel>());
+        }
+
+        private async Task PutReportBranchAsync(ReportBranchModel branch)
+        {
+            await HttpClient.PutAsJsonAsync("api/reports/branches", branch);
+        }
+
+        private async Task EditReportBranchAsync(ReportBranchModel branch)
+        {
+            await Modal.UpdateAsync(branch);
+        }
+        private async Task AddReportBranchAsync() => await Modal.CreateAsync();
     }
 }
