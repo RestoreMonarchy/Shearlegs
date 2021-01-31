@@ -16,7 +16,7 @@ function HideModal(id) {
     modal.hide();
 }
 
-function GetFormDataJson(formName)
+async function GetFormDataJson(formName)
 {
     let form = document.forms[formName];
 
@@ -25,11 +25,34 @@ function GetFormDataJson(formName)
     let data = {};
 
     for (let [key, prop] of fd) {
-        data[key] = prop;
+
+        console.log(key);
+        console.log(prop);
+
+        if (prop instanceof File) {
+            console.log('We got here dude');
+            data[key] = Array.from(new Uint8Array(await readFileAsData(prop)));
+
+        } else {
+            data[key] = prop;
+        }
+        
     }
 
     data = JSON.stringify(data, null, 2);
 
     console.log(data);
     return data;
+}
+
+async function readFileAsData(file) {
+    let result_base64 = await new Promise((resolve) => {
+        let fileReader = new FileReader();
+        fileReader.onload = (e) => resolve(fileReader.result);
+        fileReader.readAsArrayBuffer(file);
+    });
+
+    console.log(result_base64);
+
+    return result_base64;
 }
