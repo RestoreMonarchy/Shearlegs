@@ -1,0 +1,7 @@
+﻿CREATE TABLE dbo.ReportBranchSecrets
+(
+	Id INT IDENTITY(1, 1) NOT NULL CONSTRAINT PK_ReportBranchSecrets PRIMARY KEY,
+	BranchId INT CONSTRAINT FK_ReportBranchSecrets_BranchId FOREIGN KEY REFERENCES dbo.ReportBranches(Id),
+	Name NVARCHAR(255) NOT NULL,
+	Value VARBINARY(MAX) NOT NULL
+)

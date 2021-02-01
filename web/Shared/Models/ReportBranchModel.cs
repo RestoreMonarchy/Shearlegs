@@ -14,6 +14,7 @@ namespace Shearlegs.Web.Shared.Models
         public string Description { get; set; }
         public int PluginId { get; set; }
 
+        public List<ReportBranchSecretModel> Secrets { get; set; }
         public List<ReportBranchParameterModel> Parameters { get; set; }
         public ReportBranchPluginModel Plugin { get; set; }
         public ReportModel Report { get; set; }

@@ -17,6 +17,7 @@ namespace SamplePlugin
         public int FileId { get; set; }
         public string Message { get; set; } = "Welcome everybody";
         public byte[] Template { get; set; }
+        public string ConnectionString { get; set; }
     }
 
     public class SamplePlugin : ReportPlugin
@@ -44,7 +45,7 @@ namespace SamplePlugin
                 MimeType = template.MimeType
             };
 
-            var conn = new SqlConnection("Data Source=localhost;Integrated Security=True;Database=Shearlegs;");
+            var conn = new SqlConnection(parameters.ConnectionString);
             var reports = await conn.QueryAsync<string>("SELECT Name FROM dbo.Reports;");
 
             using (var ms = new MemoryStream(parameters.Template))

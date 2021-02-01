@@ -16,7 +16,7 @@ namespace Shearlegs.Web.Server.Repositories
         {
             this.connection = connection;
         }
-
+        
         public async Task<ReportArchiveModel> ArchiveReportAsync(ReportArchiveModel report)
         {
             const string sql = "INSERT INTO dbo.ReportsArchive (Name, MimeType, Content, PluginName, Parameters) " +
@@ -71,6 +71,11 @@ namespace Shearlegs.Web.Server.Repositories
             if (branch.PluginId != 0)
                 branch.Plugin = await connection.QuerySingleOrDefaultAsync<ReportBranchPluginModel>(sql1, branch);
 
+            const string sql2 = "SELECT Id, BranchId, Name, Value = CAST(Value AS NVARCHAR(MAX)) " +
+                "FROM dbo.ReportBranchSecrets WHERE BranchId = @Id;";
+
+            branch.Secrets = (await connection.QueryAsync<ReportBranchSecretModel>(sql2, branch)).ToList();
+
             return branch;
         }
 
@@ -96,13 +101,22 @@ namespace Shearlegs.Web.Server.Repositories
             return report;
         }
 
-        public async Task<ReportBranchParameterModel> AddReportBranchParameterAsync(ReportBranchParameterModel reportParameter)
+        public async Task<ReportBranchParameterModel> AddReportBranchParameterAsync(ReportBranchParameterModel parameter)
         {
             const string sql = "INSERT INTO dbo.ReportBranchParameters (BranchId, Name, InputType, IsMandatory) " +
                 "OUTPUT INSERTED.Id, INSERTED.BranchId, INSERTED.Name, INSERTED.InputType, INSERTED.IsMandatory " +
                 "VALUES (@BranchId, @Name, @InputType, @IsMandatory);";
 
-            return await connection.QuerySingleOrDefaultAsync<ReportBranchParameterModel>(sql, reportParameter);
+            return await connection.QuerySingleOrDefaultAsync<ReportBranchParameterModel>(sql, parameter);
+        }
+
+        public async Task<ReportBranchSecretModel> AddReportBranchSecretAsync(ReportBranchSecretModel secret)
+        {
+            const string sql = "INSERT INTO dbo.ReportBranchSecrets (BranchId, Name, Value) " +
+                "OUTPUT INSERTED.Id, INSERTED.BranchId, INSERTED.Name, CAST(INSERTED.Value AS NVARCHAR(MAX)) AS Value " +
+                "VALUES (@BranchId, @Name, CAST(@Value AS VARBINARY(MAX)));";
+
+            return await connection.QuerySingleOrDefaultAsync<ReportBranchSecretModel>(sql, secret);
         }
 
         public async Task RemoveReportBranchParameterAsync(int parameterId)
@@ -110,6 +124,13 @@ namespace Shearlegs.Web.Server.Repositories
             const string sql = "DELETE FROM dbo.ReportBranchParameters WHERE Id = @parameterId;";
 
             await connection.ExecuteAsync(sql, new { parameterId });
+        }
+
+        public async Task RemoveReportBranchSecretAsync(int secretId)
+        {
+            const string sql = "DELETE FROM dbo.ReportBranchSecrets WHERE Id = @secretId;";
+
+            await connection.ExecuteAsync(sql, new { secretId });
         }
 
         public async Task<IEnumerable<ReportModel>> GetReportsAsync()
@@ -144,6 +165,9 @@ namespace Shearlegs.Web.Server.Repositories
 
             const string sql1 = "SELECT * FROM dbo.ReportBranchPluginLibraries WHERE PluginId = @Id;";
 
+            const string sql2 = "SELECT Id, BranchId, Name, Value = CAST(Value AS NVARCHAR(MAX)) " +
+                "FROM dbo.ReportBranchSecrets WHERE BranchId = @Id;";
+
             var branch = (await connection.QueryAsync<ReportBranchModel, ReportModel, ReportBranchPluginModel, ReportBranchModel>(sql, (b, r, p) =>
             {
                 b.Report = r;
@@ -153,6 +177,8 @@ namespace Shearlegs.Web.Server.Repositories
 
             if (branch.Plugin != null)
                 branch.Plugin.Libraries = (await connection.QueryAsync<ReportBranchPluginLibraryModel>(sql1, branch.Plugin)).ToList();
+
+            branch.Secrets = (await connection.QueryAsync<ReportBranchSecretModel>(sql2, branch)).ToList();
 
             return branch;
         }        

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using Shearlegs.API.Plugins;
 using Shearlegs.API.Reports;
 using Shearlegs.Core.Plugins;
@@ -25,6 +26,19 @@ namespace Shearlegs.Web.Server.Controllers
         {
             this.pluginManager = pluginManager;
             this.reportsRepository = reportsRepository;
+        }
+
+        [HttpPost("secrets")]
+        public async Task<IActionResult> PostSecretAsync([FromBody] ReportBranchSecretModel secret)
+        {
+            return Ok(await reportsRepository.AddReportBranchSecretAsync(secret));
+        }
+
+        [HttpDelete("secrets/{secretId}")]
+        public async Task<IActionResult> DeleteSecretAsync(int secretId)
+        {
+            await reportsRepository.RemoveReportBranchSecretAsync(secretId);
+            return Ok();
         }
 
         [HttpPost("branches")]
@@ -109,6 +123,15 @@ namespace Shearlegs.Web.Server.Controllers
             {
                 requestBody = await reader.ReadToEndAsync();
             }
+
+            var jObject = JObject.Parse(requestBody);
+
+            foreach (var secret in branchModel.Secrets)
+            {
+                jObject.Add(secret.Name, JToken.FromObject(secret.Value));
+            }
+
+            requestBody = jObject.ToString();
 
             ITemplate template = null;
 

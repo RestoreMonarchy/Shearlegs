@@ -43,58 +43,102 @@
         </div>
 
         <div class="mb-3 bg-white p-3">
-            <form class="row g-4">
-                <div class="col-auto">
-                    <input type="text" class="form-control" @bind="Parameter.Name">
-                </div>
-                <div class="col-auto">
-                    <select class="form-select" @bind="Parameter.InputType">
-                        <option value="checkbox">checkbox</option>
-                        <option value="date">date</option>
-                        <option value="text">text</option>
-                        <option value="number">number</option>
-                        <option value="file">file</option>
-                    </select>
-                </div>
-                <div class="col-auto">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" @bind="Parameter.IsMandatory">
-                        <label class="form-check-label">
-                            Is Mandatory
-                        </label>
+            <div class="mb-3">
+                <form class="row g-4 mb-3">
+                    <div class="col-auto">
+                        <input type="text" class="form-control" @bind="Parameter.Name">
                     </div>
+                    <div class="col-auto">
+                        <select class="form-select" @bind="Parameter.InputType">
+                            <option value="checkbox">checkbox</option>
+                            <option value="date">date</option>
+                            <option value="text">text</option>
+                            <option value="number">number</option>
+                            <option value="file">file</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" @bind="Parameter.IsMandatory">
+                            <label class="form-check-label">
+                                Is Mandatory
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <a href="javascript:void(0)" class="btn btn-primary mb-3" @onclick="AddParameterAsync">Add</a>
+                    </div>
+                </form>
+
+                <div class="mb-3">
+                    <table class="table">
+                        <caption>Parameters</caption>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Input Type</th>
+                                <th>Is Mandatory</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var parameter in Branch.Parameters)
+                            {
+                                <tr>
+                                    <td>@parameter.Name</td>
+                                    <td>@parameter.InputType</td>
+                                    <td>@parameter.IsMandatory</td>
+                                    <td>
+                                        <a href="javascript:void(0)" class="btn btn-danger" @onclick="() => RemoveParameterAsync(parameter)">Remove</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
                 </div>
-                <div class="col-auto">
-                    <a href="javascript:void(0)" class="btn btn-primary mb-3" @onclick="AddParameterAsync">Add</a>
-                </div>
-            </form>
+            </div>
 
             <div class="mb-3">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Input Type</th>
-                            <th>Is Mandatory</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var parameter in Branch.Parameters)
-                        {
-                            <tr>
-                                <td>@parameter.Name</td>
-                                <td>@parameter.InputType</td>
-                                <td>@parameter.IsMandatory</td>
-                                <td>
-                                    <a href="javascript:void(0)" class="btn btn-danger" @onclick="() => RemoveParameterAsync(parameter)">Remove</a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
+                <form class="row g-4 mb-3">
+                    <div class="col-auto">
+                        <input type="text" class="form-control" @bind="Secret.Name">
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" class="form-control" @bind="Secret.Value">
+                    </div>
+                    <div class="col-auto">
+                        <a href="javascript:void(0)" class="btn btn-primary mb-3" @onclick="AddSecretAsync">Add</a>
+                    </div>
+                </form>
 
-                </table>
+                <div class="mb-3">
+                    <table class="table">
+                        <caption>Secret Parameters</caption>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Value</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var secret in Branch.Secrets)
+                            {
+                                <tr>
+                                    <td>@secret.Name</td>
+                                    <td>@secret.Value</td>
+                                    <td>
+                                        <a href="javascript:void(0)" class="btn btn-danger" @onclick="() => RemoveSecretAsync(secret)">Remove</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
             </div>
+            
         </div>
     }
 

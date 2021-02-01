@@ -29,7 +29,7 @@ namespace Shearlegs.Web.Client.Pages.Admin
             await ReloadBranchAsync(Report.Branches.FirstOrDefault()?.Id ?? 0);
         }
 
-        public ReportBranchParameterModel Parameter { get; set; }
+        
 
         private async Task OnChangeBranchAsync(ChangeEventArgs e)
         {
@@ -50,7 +50,15 @@ namespace Shearlegs.Web.Client.Pages.Admin
                 BranchId = Branch.Id,
                 InputType = "text"
             };
+            Secret = new ReportBranchSecretModel()
+            {
+                BranchId = Branch.Id,
+            };
+            
         }
+
+        public ReportBranchParameterModel Parameter { get; set; }
+        public ReportBranchSecretModel Secret { get; set; }
 
         public async Task AddParameterAsync()
         {
@@ -64,6 +72,20 @@ namespace Shearlegs.Web.Client.Pages.Admin
         {
             await HttpClient.DeleteAsync("api/reports/parameters/" + parameter.Id);
             Branch.Parameters.Remove(parameter);
+        }
+
+        public async Task AddSecretAsync()
+        {
+            var response = await HttpClient.PostAsJsonAsync("api/reports/secrets", Secret);
+            Secret = await response.Content.ReadFromJsonAsync<ReportBranchSecretModel>();
+            Branch.Secrets.Add(Secret);
+            Secret = new ReportBranchSecretModel() { BranchId = Branch.Id };
+        }
+
+        public async Task RemoveSecretAsync(ReportBranchSecretModel secret)
+        {
+            await HttpClient.DeleteAsync("api/reports/secrets/" + secret.Id);
+            Branch.Secrets.Remove(secret);
         }
 
         private async Task PostReportBranchAsync(ReportBranchModel branch)
