@@ -23,6 +23,38 @@
                     </ul>
                 </li>
             </ul>
+            @if (state.User == null)
+            {
+                <EditForm class="d-flex" Model="Params" OnValidSubmit="SignInAsync">
+                    <InputText class="form-control me-2" @bind-Value="Params.Name" />
+                    <InputText class="form-control me-2" type="password" @bind-Value="Params.Password" />
+                    <button class="btn btn-outline-success" type="submit">Sign In</button>
+                </EditForm>
+            }
+            else
+            {
+                <div class="d-flex">
+                    <a href="/signout" class="btn btn-primary">@state.User.Name Sign Out</a>
+                </div>
+            }
+
         </div>
     </div>
 </nav>
+
+@code {
+
+    [Inject]
+    public HttpClient HttpClient { get; set; }
+    [Inject]
+    public AuthenticationStateProvider AuthenticationState { get; set; }
+
+    private CustomAuthenticationProvider state => (CustomAuthenticationProvider)AuthenticationState;
+
+    public LoginParams Params { get; set; } = new LoginParams();
+
+    public async Task SignInAsync()
+    {
+        await HttpClient.PostAsJsonAsync("signin", Params);
+    }
+}

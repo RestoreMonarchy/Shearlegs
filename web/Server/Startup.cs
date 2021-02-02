@@ -9,6 +9,7 @@ using System.Linq;
 using Shearlegs.Runtime;
 using System.Data.SqlClient;
 using Shearlegs.Web.Server.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Shearlegs.Web.Server
 {
@@ -28,6 +29,11 @@ namespace Shearlegs.Web.Server
 
             services.AddTransient(x => new SqlConnection(Configuration.GetConnectionString("Default")));
             services.AddTransient<ReportsRepository>();
+            services.AddTransient<UsersRepository>();
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie();
+
 
             services.AddControllersWithViews();
             services.AddRazorPages();
@@ -53,6 +59,9 @@ namespace Shearlegs.Web.Server
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

@@ -29,8 +29,6 @@ namespace Shearlegs.Web.Client.Pages.Admin
             await ReloadBranchAsync(Report.Branches.FirstOrDefault()?.Id ?? 0);
         }
 
-        
-
         private async Task OnChangeBranchAsync(ChangeEventArgs e)
         {
             await ReloadBranchAsync(int.Parse(e.Value.ToString()));
