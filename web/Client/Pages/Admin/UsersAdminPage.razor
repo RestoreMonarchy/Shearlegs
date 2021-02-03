@@ -1,0 +1,25 @@
+﻿@page "/admin/users"
+
+@if (Users != null)
+{
+    <a class="btn btn-primary" href="/admin/users/add">Add User</a>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Users)
+            {
+                <tr style="cursor: pointer;" @onclick="() => GoToUser(user)">
+                    <td>@user.Id</td>
+                    <td>@user.Name</td>
+                    <td>@user.Role</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,9 @@
+﻿@page "/admin/users/{UserId:int}"
+
+@if (User != null)
+{
+    <div class="p-3 bg-light">
+        <h4>Update @User.Name</h4>
+        <UserFormComponent User="User" OnSubmit="UpdateUserAsync" />
+    </div>
+}

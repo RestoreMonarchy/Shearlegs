@@ -1,0 +1,6 @@
+﻿@page "/admin/users/add"
+
+<div class="p-3 bg-light">
+    <h4>Add New User</h4>
+    <UserFormComponent User="new UserModel() { Role = RoleConstants.DefaultRoleId }" OnSubmit="AddUserAsync" />
+</div>

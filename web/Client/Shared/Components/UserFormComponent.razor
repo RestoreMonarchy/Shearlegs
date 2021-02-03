@@ -1,0 +1,42 @@
+﻿
+@if (User != null)
+{
+    <EditForm Model="User" OnValidSubmit="SubmitAsync">
+        <label for="username" class="form-label">Username</label>
+        <div class="input-group mb-3">
+            <InputText type="text" class="form-control" id="username" @bind-Value="User.Name" />
+        </div>
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group mb-3">
+            <InputText type="password" class="form-control" id="password" @bind-Value="User.Password" />
+        </div>
+
+        <label for="role" class="form-label">Role</label>
+        <div class="input-group mb-3">
+            <InputSelect class="form-select" id="role" @bind-Value="User.Role">
+                <option value="@RoleConstants.DefaultRoleId">@RoleConstants.DefaultRoleId</option>
+                <option value="@RoleConstants.AdminRoleId">@RoleConstants.AdminRoleId</option>
+            </InputSelect>
+        </div>
+
+        <button class="btn btn-primary">Submit</button>
+    </EditForm>
+} else
+{
+    <ProgressBar />
+}
+
+
+
+@code {
+    [Parameter]
+    public UserModel User { get; set; }
+
+    [Parameter]
+    public EventCallback<UserModel> OnSubmit { get; set; }
+
+    private async Task SubmitAsync()
+    {
+        await OnSubmit.InvokeAsync(User);
+    }
+}
