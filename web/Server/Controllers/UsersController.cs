@@ -107,8 +107,7 @@ namespace Shearlegs.Web.Server.Controllers
         [HttpGet("~/signout"), HttpPost("~/signout")]
         public IActionResult SignOutAsync()
         {
-            return SignOut(new AuthenticationProperties { RedirectUri = "/" },
-                CookieAuthenticationDefaults.AuthenticationScheme);
+            return SignOut(new AuthenticationProperties() { RedirectUri = "/" }, CookieAuthenticationDefaults.AuthenticationScheme);
         }
     }
 }

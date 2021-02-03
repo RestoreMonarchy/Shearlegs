@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Shearlegs.Web.Client.Extensions;
 using Shearlegs.Web.Shared.Models;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Shearlegs.Web.Client.Pages
 {
+    [Authorize]
     public partial class ReportGeneratePage
     {
         [Inject]

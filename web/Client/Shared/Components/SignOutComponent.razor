@@ -1,0 +1,20 @@
+﻿<div class="d-flex">
+    <a @onclick="SignOutAsync" class="btn btn-primary">@state.User.Name Sign Out</a>
+</div>
+
+@code {
+    [Inject]
+    public HttpClient HttpClient { get; set; }
+    [Inject]
+    public AuthenticationStateProvider AuthenticationState { get; set; }
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    private CustomAuthenticationProvider state => (CustomAuthenticationProvider)AuthenticationState;
+
+    public async Task SignOutAsync()
+    {
+        await HttpClient.PostAsync("signout", new StringContent(""));
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+}

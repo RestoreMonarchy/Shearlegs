@@ -1,0 +1,39 @@
+﻿<EditForm class="row row-cols-lg-auto g-3 align-items-center" Model="Params" OnValidSubmit="SignInAsync">
+    <div class="col-12">
+        <div class="input-group">
+            <InputText class="form-control" placeholder="Username" @bind-Value="Params.Name" />
+        </div>
+    </div>
+
+    <div class="col-12">
+        <InputText class="form-control" placeholder="Password" type="password" @bind-Value="Params.Password" />
+    </div>
+
+    <div class="col-12">
+        <button class="btn btn-outline-success" type="submit">Sign In</button>
+    </div>
+</EditForm>
+
+@code {
+    [Inject]
+    public HttpClient HttpClient { get; set; }
+    [Inject]
+    public AuthenticationStateProvider AuthenticationState { get; set; }
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    private CustomAuthenticationProvider state => (CustomAuthenticationProvider)AuthenticationState;
+
+    public LoginParams Params { get; set; } = new LoginParams();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await state.GetAuthenticationStateAsync();
+    }
+
+    public async Task SignInAsync()
+    {
+        await HttpClient.PostAsJsonAsync("signin", Params);
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+}

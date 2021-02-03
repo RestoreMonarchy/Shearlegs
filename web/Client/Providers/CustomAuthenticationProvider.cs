@@ -25,18 +25,13 @@ namespace Shearlegs.Web.Client.Providers
         {
             var response = await httpClient.GetAsync("api/users/me");
             if (response.IsSuccessStatusCode)
-            {
                 User = await response.Content.ReadFromJsonAsync<UserModel>();
-            }
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            if (User == null)
-            {
-                await UpdateUserAsync();
-            }                
-
+            await UpdateUserAsync();          
+            
             ClaimsIdentity identity;
             if (User == null)
             {
@@ -48,7 +43,7 @@ namespace Shearlegs.Web.Client.Providers
                     new Claim(ClaimTypes.NameIdentifier, User.Id.ToString()),
                     new Claim(ClaimTypes.Name, User.Name),
                     new Claim(ClaimTypes.Role, User.Role)
-                });
+                }, "Custom");
             }
 
             return new AuthenticationState(new ClaimsPrincipal(identity));
