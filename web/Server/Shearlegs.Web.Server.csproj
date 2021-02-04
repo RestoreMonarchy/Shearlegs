@@ -4,6 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Shearlegs.Web.Server</RootNamespace>
     <AssemblyName>Shearlegs.Web.Server</AssemblyName>
+    <UserSecretsId>7c3261d1-2940-4087-a413-e96b52287aec</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
