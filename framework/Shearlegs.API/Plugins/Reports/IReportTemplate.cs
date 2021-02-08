@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Shearlegs.API.Plugins
+namespace Shearlegs.API.Plugins.Reports
 {
-    public interface ITemplate
+    public interface IReportTemplate
     {
         public byte[] Data { get; }
         public string MimeType { get; }

@@ -1,9 +1,6 @@
-﻿using Shearlegs.API.Reports;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Shearlegs.API.Plugins.Reports;
 
-namespace Shearlegs.Core.Reports
+namespace Shearlegs.Core.Plugins.Reports
 {
     public class ReportFile : IReportFile
     {

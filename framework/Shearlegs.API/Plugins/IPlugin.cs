@@ -8,6 +8,7 @@ namespace Shearlegs.API.Plugins
     {
         string Name { get; }
         string Version { get; }
-        Assembly Assembly { get; }
+        string Author { get; }
+        Assembly Assembly { get; }        
     }
 }

@@ -25,7 +25,6 @@ namespace Shearlegs.Web.Server
         public void ConfigureServices(IServiceCollection services)
         {
             ShearlegsRuntime.RegisterServices(services);
-            services.AddHostedService<ShearlegsRuntime>();
 
             services.AddTransient(x => new SqlConnection(Configuration.GetConnectionString("Default")));
             services.AddTransient<ReportsRepository>();

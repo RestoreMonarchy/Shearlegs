@@ -1,16 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using Shearlegs.API.Plugins;
-using Shearlegs.API.Reports;
-using Shearlegs.Core.Plugins;
-using Shearlegs.Core.Reports;
+using Shearlegs.API.Plugins.Reports;
+using Shearlegs.Core.Plugins.Reports;
 using Shearlegs.Web.Server.Repositories;
 using Shearlegs.Web.Shared.Models;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Shearlegs.Web.Server.Controllers
@@ -19,12 +14,12 @@ namespace Shearlegs.Web.Server.Controllers
     [Route("api/[controller]")]
     public class ReportsController : ControllerBase
     {
-        private readonly IPluginManager pluginManager;
+        private readonly IReportPluginManager reportPluginManager;
         private readonly ReportsRepository reportsRepository;
 
-        public ReportsController(IPluginManager pluginManager, ReportsRepository reportsRepository)
+        public ReportsController(IReportPluginManager reportPluginManager, ReportsRepository reportsRepository)
         {
-            this.pluginManager = pluginManager;
+            this.reportPluginManager = reportPluginManager;
             this.reportsRepository = reportsRepository;
         }
 
@@ -133,11 +128,11 @@ namespace Shearlegs.Web.Server.Controllers
 
             requestBody = jObject.ToString();
 
-            ITemplate template = null;
+            IReportTemplate template = null;
 
             if (branchModel.Plugin.TemplateContent != null)
             {
-                template = new Template()
+                template = new ReportTemplate()
                 {
                     Data = branchModel.Plugin.TemplateContent,
                     MimeType = branchModel.Plugin.TemplateMimeType,
@@ -145,15 +140,23 @@ namespace Shearlegs.Web.Server.Controllers
                 };
             }
 
-            var report = await pluginManager.ExecuteReportPluginAsync(branchModel.Report.Name, requestBody, branchModel.Plugin.Content, 
-                template, branchModel.Plugin.Libraries.Select(x => x.Content));
+            var args = new ExecuteReportPluginArguments()
+            {
+                PluginName = branchModel.Report.Name,
+                JsonParameters = requestBody,
+                PluginData = branchModel.Plugin.Content,
+                ReportTemplate = template,
+                LibrariesData = branchModel.Plugin.Libraries.Select(x => x.Content)
+            };
+
+            var result = await reportPluginManager.ExecuteReportPluginAsync(args);
 
             var reportArchive = new ReportArchiveModel()
             {
-                Name = report.Name,
-                Content = report.Data,
-                MimeType = report.MimeType,
-                PluginName = report.Name,
+                Name = result.ReportFile.Name,
+                Content = result.ReportFile.Data,
+                MimeType = result.ReportFile.MimeType,
+                PluginName = result.ReportFile.Name,
                 Parameters = requestBody
             };
 

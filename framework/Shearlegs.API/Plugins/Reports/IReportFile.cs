@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Shearlegs.API.Reports
+namespace Shearlegs.API.Plugins.Reports
 {
     public interface IReportFile
     {

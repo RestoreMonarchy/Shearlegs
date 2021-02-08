@@ -1,13 +1,9 @@
-﻿using Newtonsoft.Json;
-using Shearlegs.API.Plugins;
-using Shearlegs.API.Reports;
+﻿using Shearlegs.API.Plugins.Reports;
+using Shearlegs.Core.Reports;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Shearlegs.Core.Reports
+namespace Shearlegs.Core.Plugins.Reports
 {
     public class ReportPlugin : PluginBase, IReportPlugin
     {
