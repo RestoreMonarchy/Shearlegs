@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Shearlegs.API.Plugins.Reports;
 using Shearlegs.Core.Plugins.Reports;
 using Shearlegs.Web.Server.Repositories;
+using Shearlegs.Web.Shared.Constants;
 using Shearlegs.Web.Shared.Models;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Shearlegs.Web.Server.Controllers
@@ -23,12 +26,14 @@ namespace Shearlegs.Web.Server.Controllers
             this.reportsRepository = reportsRepository;
         }
 
+        [Authorize(Roles = RoleConstants.AdminRoleId)]
         [HttpPost("secrets")]
         public async Task<IActionResult> PostSecretAsync([FromBody] ReportBranchSecretModel secret)
         {
             return Ok(await reportsRepository.AddReportBranchSecretAsync(secret));
         }
 
+        [Authorize(Roles = RoleConstants.AdminRoleId)]
         [HttpDelete("secrets/{secretId}")]
         public async Task<IActionResult> DeleteSecretAsync(int secretId)
         {
@@ -36,12 +41,14 @@ namespace Shearlegs.Web.Server.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = RoleConstants.AdminRoleId)]
         [HttpPost("branches")]
         public async Task<IActionResult> PostBranchAsync([FromBody] ReportBranchModel branch)
         {
             return Ok(await reportsRepository.AddReportBranchAsync(branch));
         }
 
+        [Authorize(Roles = RoleConstants.AdminRoleId)]
         [HttpPut("branches")]
         public async Task<IActionResult> PutBranchAsync([FromBody] ReportBranchModel branch)
         {
@@ -49,12 +56,14 @@ namespace Shearlegs.Web.Server.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetReportsAsync()
         {
             return Ok(await reportsRepository.GetReportsAsync());
         }
 
+        [Authorize(Roles = RoleConstants.AdminRoleId)]
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromBody] ReportModel reportModel)
         {
@@ -62,6 +71,7 @@ namespace Shearlegs.Web.Server.Controllers
             return Ok(reportModel);
         }
 
+        [Authorize(Roles = RoleConstants.AdminRoleId)]
         [HttpPut]
         public async Task<IActionResult> PutReportAsync([FromBody] ReportModel reportModel)
         {
@@ -69,24 +79,28 @@ namespace Shearlegs.Web.Server.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpGet("{reportId}")]
         public async Task<IActionResult> GetReportAsync(int reportId)
         {
             return Ok(await reportsRepository.GetReportAsync(reportId));
         }
 
+        [Authorize(Roles = RoleConstants.AdminRoleId)]
         [HttpGet("branches/{branchId}")]
         public async Task<IActionResult> GetReportBranchAsync(int branchId)
         {
             return Ok(await reportsRepository.GetReportBranchAsync(branchId));
         }
 
+        [Authorize(Roles = RoleConstants.AdminRoleId)]
         [HttpPost("parameters")]
         public async Task<IActionResult> PostReportParameterAsync([FromBody] ReportBranchParameterModel reportParameter)
         {
             return Ok(await reportsRepository.AddReportBranchParameterAsync(reportParameter));
         }
 
+        [Authorize(Roles = RoleConstants.AdminRoleId)]
         [HttpDelete("parameters/{reportParameterId}")]
         public async Task<IActionResult> DeleteReportParameterAsync(int reportParameterId)
         {
@@ -94,6 +108,7 @@ namespace Shearlegs.Web.Server.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = RoleConstants.AdminRoleId)]
         [HttpPost("plugin")]
         public async Task<IActionResult> PostPluginAsync([FromBody] ReportBranchPluginModel reportPluginModel)
         {
@@ -101,6 +116,7 @@ namespace Shearlegs.Web.Server.Controllers
             return Ok(reportPluginModel);
         }
 
+        [Authorize]
         [HttpGet("archive/{id}/file")]
         public async Task<IActionResult> GetReportArchiveAsync(int id)
         {
@@ -108,6 +124,7 @@ namespace Shearlegs.Web.Server.Controllers
             return File(reportArchive.Content, reportArchive.MimeType, reportArchive.Name);
         }
 
+        [Authorize]
         [HttpPost("{branchId}/execute")]
         public async Task<IActionResult> PostAsync(int branchId)
         {
@@ -150,6 +167,11 @@ namespace Shearlegs.Web.Server.Controllers
             };
 
             var result = await reportPluginManager.ExecuteReportPluginAsync(args);
+
+            if (!result.IsSuccess)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, result.ErrorResponse);
+            }
 
             var reportArchive = new ReportArchiveModel()
             {

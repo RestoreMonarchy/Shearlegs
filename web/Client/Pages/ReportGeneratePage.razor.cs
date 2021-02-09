@@ -6,6 +6,7 @@ using Shearlegs.Web.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -51,12 +52,25 @@ namespace Shearlegs.Web.Client.Pages
 
         private ReportArchiveModel reportArchive;
 
+        private string errorString;
+        private bool isWaiting;
+
         public async Task GenerateReportAsync()
         {
+            errorString = null;
+            reportArchive = null;
+            isWaiting = true;
             string json = await JsRuntime.GetFormDataJsonAsync("reportParameters");
-            Console.WriteLine(json);
             var response = await HttpClient.PostAsync($"api/reports/{Branch.Id}/execute", new StringContent(json));
-            reportArchive = await response.Content.ReadFromJsonAsync<ReportArchiveModel>();
+
+            if (response.StatusCode == HttpStatusCode.InternalServerError)
+            {
+                errorString = await response.Content.ReadAsStringAsync();
+            } else
+            {
+                reportArchive = await response.Content.ReadFromJsonAsync<ReportArchiveModel>();
+            }
+            isWaiting = false;
         }
     }
 }

@@ -10,5 +10,7 @@ namespace Shearlegs.API.Plugins.Reports
         public string Message { get; set; }
         public Exception Exception { get; set; }
         public IReportFile ReportFile { get; set; }
+
+        public string ErrorResponse => $"<strong>{Message}</strong><br />{Exception}";
     }
 }

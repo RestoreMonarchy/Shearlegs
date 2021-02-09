@@ -24,22 +24,47 @@
                 <p>Description: <span class="text-muted">@Branch.Description</span></p>
             </div>            
 
-            <form name="reportParameters">
+            <form name="reportParameters" @onsubmit="GenerateReportAsync">
                 @foreach (var parameter in Branch.Parameters)
                 {
                     <div class="mb-3">
                         <label class="form-label">@parameter.Name</label>
-                        <input type="@parameter.InputType" name="@parameter.Name" class="form-control">
+                        <input type="@parameter.InputType" name="@parameter.Name" class="form-control" required="@parameter.IsMandatory">
                     </div>
                 }
+
+                <button class="btn btn-primary mt-2" type="submit" disabled="@isWaiting">
+                    @if (isWaiting)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span>Generating...</span>
+                    }
+                    else
+                    {
+                        <span>Generate Report</span>
+                    }
+                </button>
             </form>
-            <button class="btn btn-primary mt-3" @onclick="GenerateReportAsync">Generate Report</button>
 
+            
 
-            <div class="mt-5">
+            <div class="mt-4">
                 @if (reportArchive != null)
                 {
-                    <a class="btn btn-primary" href="/api/reports/archive/@reportArchive.Id/file">Download @reportArchive.Name</a>
+                    <div class="d-flex">
+                        <h4 class="text-success me-3">Your report was successfully generated</h4>
+                        <a class="btn btn-primary" href="/api/reports/archive/@reportArchive.Id/file">Download @reportArchive.Name</a>
+                    </div>
+                    
+                }
+                @if (errorString != null)
+                {
+                    <div>
+                        <h4 class="text-danger">Failed to generate report, error response: </h4>
+                        <code>
+                            @(new MarkupString(errorString))
+                        </code>
+                    </div>
                 }
             </div>
         }
