@@ -67,7 +67,4 @@
     <Build Include="tables\ReportBranches.sql" />
     <Build Include="tables\ReportBranchPluginLibraries.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Shearlegs_1.Web.Database.publish.xml" />
-  </ItemGroup>
 </Project>
