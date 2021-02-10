@@ -48,6 +48,8 @@ namespace Shearlegs.Core.Reports
                     service.GetCustomAttribute<ServiceAttribute>().Lifetime));
             }
 
+            Console.WriteLine($"parameters is null? {parameters == null}");
+
             if (parameters != null)
                 serviceCollection.Add(new ServiceDescriptor(parameters, JsonConvert.DeserializeObject(jsonParameters, parameters)));
 

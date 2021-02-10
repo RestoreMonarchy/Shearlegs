@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleQuery", "samples\Simp
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Shearlegs.Web.Database", "web\Database\Shearlegs.Web.Database.sqlproj", "{A97185A8-3F59-4BD9-A42B-80B0DCA3602B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestingApp", "samples\TestingApp\TestingApp.csproj", "{BF99B815-CABD-4EAC-9541-AF1468682294}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{A97185A8-3F59-4BD9-A42B-80B0DCA3602B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A97185A8-3F59-4BD9-A42B-80B0DCA3602B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A97185A8-3F59-4BD9-A42B-80B0DCA3602B}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{BF99B815-CABD-4EAC-9541-AF1468682294}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF99B815-CABD-4EAC-9541-AF1468682294}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF99B815-CABD-4EAC-9541-AF1468682294}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF99B815-CABD-4EAC-9541-AF1468682294}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,6 +84,7 @@ Global
 		{5ECFFF1B-0D64-496C-AF25-606CFD4979E6} = {8BE27CC9-EE8E-4571-AF1B-3F8E4952F2CC}
 		{11533676-1F87-41E4-86CE-ED551C36A040} = {D87E0251-7E48-45D8-9E79-79B85A68B65F}
 		{A97185A8-3F59-4BD9-A42B-80B0DCA3602B} = {8BE27CC9-EE8E-4571-AF1B-3F8E4952F2CC}
+		{BF99B815-CABD-4EAC-9541-AF1468682294} = {D87E0251-7E48-45D8-9E79-79B85A68B65F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FDCFCEB4-2065-436D-AA62-62CF50DBDBB0}
