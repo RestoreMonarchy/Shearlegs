@@ -28,14 +28,7 @@ namespace TestingApp
             instance.InitializeAsync().GetAwaiter().GetResult();
         }
 
-        private void BuildServiceProvider()
-        {
-            IServiceCollection services = new ServiceCollection();
-            services.AddLogging();
-            ShearlegsRuntime.RegisterServices(services);
-
-            serviceProvider = services.BuildServiceProvider();
-        }
+        
 
         async Task InitializeAsync()
         {
