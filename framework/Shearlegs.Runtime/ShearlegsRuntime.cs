@@ -4,6 +4,7 @@ using Shearlegs.API.Plugins.Reports;
 using Shearlegs.Core.Plugins;
 using Shearlegs.Core.Reports;
 using System;
+using System.Reflection;
 
 namespace Shearlegs.Runtime
 {

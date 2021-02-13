@@ -1,5 +1,5 @@
 {
-  "OutputFileName": "hello",
+  "OutputFileName": "hello.xlsx",
   "Query": "select * from sys.databases",
   "WorksheetName": "mcrow_talking_here",
   "ConnectionString": "Data Source=localhost;Integrated Security=True;Database=Shearlegs;"

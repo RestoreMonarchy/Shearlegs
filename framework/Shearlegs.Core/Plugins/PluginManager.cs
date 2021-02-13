@@ -18,21 +18,20 @@ namespace Shearlegs.Core.Reports
             this.logger = logger;
         }
 
-        public IPlugin ActivatePlugin(Assembly assembly, string jsonParameters, Action<IServiceCollection> action)
+        public T ActivatePlugin<T>(Assembly assembly, string jsonParameters, Action<IServiceCollection> action) where T : IPlugin
         {
             var pluginType = assembly.GetTypes().FirstOrDefault(x => x.GetInterface(nameof(IPlugin)) != null);
 
             if (pluginType == null)
             {
                 logger.LogWarning($"{assembly.GetName().Name} is not valid plugin assembly!");
-                return null;
+                return default;
             }
 
             var services = assembly.GetTypes().Where(x => x.GetCustomAttribute<ServiceAttribute>() != null);
             var parameters = assembly.GetTypes().FirstOrDefault(x => x.GetCustomAttribute<ParametersAttribute>() != null);
 
             // Add plugin as singleton service
-            IPlugin pluginInstance;
             IServiceCollection serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton(pluginType);
 
@@ -48,15 +47,11 @@ namespace Shearlegs.Core.Reports
                     service.GetCustomAttribute<ServiceAttribute>().Lifetime));
             }
 
-            Console.WriteLine($"parameters is null? {parameters == null}");
-
             if (parameters != null)
                 serviceCollection.Add(new ServiceDescriptor(parameters, JsonConvert.DeserializeObject(jsonParameters, parameters)));
 
             IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
-            pluginInstance = serviceProvider.GetRequiredService(pluginType) as IPlugin;
-
-            return pluginInstance;
+            return (T)serviceProvider.GetRequiredService(pluginType);
         }
     }
 }

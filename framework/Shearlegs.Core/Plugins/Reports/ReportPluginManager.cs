@@ -38,7 +38,7 @@ namespace Shearlegs.Core.Plugins
                     services.AddSingleton(args.ReportTemplate);
             }
 
-            var plugin = pluginManager.ActivatePlugin(pluginAssembly, args.JsonParameters, AddServices) as IReportPlugin;
+            var plugin = pluginManager.ActivatePlugin<IReportPlugin>(pluginAssembly, args.JsonParameters, AddServices);
 
             var result = new ExecuteReportPluginResult();
             if (plugin == null)
