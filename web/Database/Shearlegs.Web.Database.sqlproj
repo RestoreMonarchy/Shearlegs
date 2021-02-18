@@ -66,5 +66,7 @@
     <Build Include="tables\ReportBranchSecrets.sql" />
     <Build Include="tables\ReportBranches.sql" />
     <Build Include="tables\ReportBranchPluginLibraries.sql" />
+    <Build Include="tables\ReportUsers.sql" />
+    <Build Include="tables\Users.sql" />
   </ItemGroup>
 </Project>
