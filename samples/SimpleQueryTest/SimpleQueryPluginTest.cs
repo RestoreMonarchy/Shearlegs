@@ -6,6 +6,7 @@ using Shearlegs.Core.Plugins.Reports;
 using Shearlegs.Core.Reports;
 using Shearlegs.Runtime;
 using SimpleQuery;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -17,6 +18,8 @@ namespace SimpleQueryTest
         [TestMethod]
         public async Task TestMethod1()
         {
+            System.Console.WriteLine($"test started at {DateTime.Now}");
+
             var serviceProvider = ShearlegsRuntime.BuildServiceProvider();
 
             string jsonParameters = null;
