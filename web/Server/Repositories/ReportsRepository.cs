@@ -11,18 +11,34 @@ namespace Shearlegs.Web.Server.Repositories
     public class ReportsRepository
     {
         private readonly SqlConnection connection;
-
+        
         public ReportsRepository(SqlConnection connection)
         {
             this.connection = connection;
         }
+
+        public async Task<ReportUserModel> AddReportUserAsync(ReportUserModel reportUser)
+        {
+            const string sql = "INSERT INTO dbo.ReportUsers (ReportId, UserId, AdminId) " +
+                "OUTPUT INSERTED.Id, INSERTED.ReportId, INSERTED.UserId, INSERTED.AdminId, INSERTED.CreateDate " +
+                "VALUES (@ReportId, @UserId, @AdminId);";
+
+            return await connection.QuerySingleAsync(sql, reportUser);
+        }
         
+        public async Task DeleteReportUserAsync(int reportUserId)
+        {
+            const string sql = "DELETE FROM dbo.ReportUsers WHERE Id = @reportUserId;";
+
+            await connection.ExecuteAsync(sql, reportUserId);
+        }
+
         public async Task<ReportArchiveModel> ArchiveReportAsync(ReportArchiveModel report)
         {
             const string sql = "INSERT INTO dbo.ReportsArchive (Name, MimeType, Content, PluginName, Parameters) " +
                 "OUTPUT INSERTED.Id, INSERTED.Name, INSERTED.MimeType, INSERTED.PluginName, INSERTED.Parameters, " +
                 "INSERTED.CreateDate VALUES (@Name, @MimeType, @Content, @PluginName, @Parameters);";
-            return await connection.QuerySingleOrDefaultAsync<ReportArchiveModel>(sql, report);
+            return await connection.QuerySingleAsync<ReportArchiveModel>(sql, report);
         }
 
         public async Task<ReportArchiveModel> GetReportArchiveAsync(int id)
@@ -189,7 +205,7 @@ namespace Shearlegs.Web.Server.Repositories
                 "OUTPUT INSERTED.Id " +
                 "VALUES (@Name, @Description, @Enabled); " +
                 "INSERT INTO dbo.ReportBranches (ReportId, Name, Description) " +
-                "VALUES (SCOPE_IDENTITY(), 'PRODUCTION', 'Production environment branch');";
+                "VALUES (SCOPE_IDENTITY(), 'DEVELOPMENT', 'Production environment branch');";
 
             reportModel.Id = await connection.ExecuteScalarAsync<int>(sql, reportModel);
         }

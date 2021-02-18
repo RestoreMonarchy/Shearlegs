@@ -27,6 +27,22 @@ namespace Shearlegs.Web.Server.Controllers
         }
 
         [Authorize(Roles = RoleConstants.AdminRoleId)]
+        [HttpPost("users")]
+        public async Task<IActionResult> PostReportUserAsync([FromBody] ReportUserModel reportUser)
+        {
+            return Ok(await reportsRepository.AddReportUserAsync(reportUser));
+        }
+
+        [Authorize(Roles = RoleConstants.AdminRoleId)]
+        [HttpDelete("users/{reportUserId}")]
+        public async Task<IActionResult> DeleteReportUserAsync(int reportUserId)
+        {
+            await reportsRepository.DeleteReportUserAsync(reportUserId);
+            return Ok();
+        }
+
+
+        [Authorize(Roles = RoleConstants.AdminRoleId)]
         [HttpPost("secrets")]
         public async Task<IActionResult> PostSecretAsync([FromBody] ReportBranchSecretModel secret)
         {
@@ -121,6 +137,7 @@ namespace Shearlegs.Web.Server.Controllers
         public async Task<IActionResult> GetReportArchiveAsync(int id)
         {
             var reportArchive = await reportsRepository.GetReportArchiveAsync(id);
+            
             return File(reportArchive.Content, reportArchive.MimeType, reportArchive.Name);
         }
 
