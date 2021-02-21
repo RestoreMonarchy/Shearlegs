@@ -23,14 +23,14 @@ namespace Shearlegs.Web.Server.Repositories
                 "OUTPUT INSERTED.Id, INSERTED.ReportId, INSERTED.UserId, INSERTED.AdminId, INSERTED.CreateDate " +
                 "VALUES (@ReportId, @UserId, @AdminId);";
 
-            return await connection.QuerySingleAsync(sql, reportUser);
+            return await connection.QuerySingleAsync<ReportUserModel>(sql, reportUser);
         }
         
         public async Task DeleteReportUserAsync(int reportUserId)
         {
             const string sql = "DELETE FROM dbo.ReportUsers WHERE Id = @reportUserId;";
 
-            await connection.ExecuteAsync(sql, reportUserId);
+            await connection.ExecuteAsync(sql, new { reportUserId });
         }
 
         public async Task<ReportArchiveModel> ArchiveReportAsync(ReportArchiveModel report)

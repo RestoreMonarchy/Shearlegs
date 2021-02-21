@@ -30,6 +30,7 @@ namespace Shearlegs.Web.Server.Controllers
         [HttpPost("users")]
         public async Task<IActionResult> PostReportUserAsync([FromBody] ReportUserModel reportUser)
         {
+            reportUser.AdminId = int.Parse(User.Identity.Name);
             return Ok(await reportsRepository.AddReportUserAsync(reportUser));
         }
 

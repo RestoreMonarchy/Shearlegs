@@ -34,8 +34,28 @@ namespace Shearlegs.Web.Server.Repositories
 
         public async Task<UserModel> GetUserAsync(int id)
         {
-            const string sql = "SELECT Id, Name, Role, CreateDate FROM dbo.Users WHERE Id = @id";
-            return await connection.QuerySingleOrDefaultAsync<UserModel>(sql, new { id });
+            const string sql = "SELECT u.Id, u.Name, u.Role, u.CreateDate, ru.* " +
+                "FROM dbo.Users u LEFT JOIN dbo.ReportUsers ru ON ru.UserId = u.Id WHERE u.Id = @id";
+
+            UserModel user = null;
+
+            await connection.QueryAsync<UserModel, ReportUserModel, UserModel>(sql, (u, ru) =>
+            {
+                if (user == null)
+                {
+                    user = u;
+                    user.ReportUsers = new List<ReportUserModel>();
+                }
+
+                if (ru != null)
+                {
+                    user.ReportUsers.Add(ru);
+                }
+
+                return null;
+            } , new { id });
+
+            return user;
         }
 
         public async Task<IEnumerable<UserModel>> GetUsersAsync()

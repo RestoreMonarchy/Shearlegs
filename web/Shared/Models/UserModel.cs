@@ -12,7 +12,9 @@ namespace Shearlegs.Web.Shared.Models
         public string Name { get; set; }
         public string Role { get; set; }
         public DateTime CreateDate { get; set; }
-
+        
         public string Password { get; set; }
+
+        public List<ReportUserModel> ReportUsers { get; set; }
     }
 }

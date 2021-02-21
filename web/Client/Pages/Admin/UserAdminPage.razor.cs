@@ -21,15 +21,36 @@ namespace Shearlegs.Web.Client.Pages.Admin
         public HttpClient HttpClient { get; set; }
 
         public UserModel User { get; set; }
+        public List<ReportModel> Reports { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
             User = await HttpClient.GetFromJsonAsync<UserModel>("api/users/" + UserId);
+            Reports = await HttpClient.GetFromJsonAsync<List<ReportModel>>("api/reports");
         }
 
         private async Task UpdateUserAsync(UserModel user)
         {
             await HttpClient.PutAsJsonAsync("api/users", user);
+        }
+
+        private async Task AddReportUser(ReportModel report)
+        {
+            var reportUser = new ReportUserModel()
+            {
+                ReportId = report.Id,
+                UserId = User.Id
+            };
+            var response = await HttpClient.PostAsJsonAsync("api/reports/users", reportUser);
+            reportUser = await response.Content.ReadFromJsonAsync<ReportUserModel>();
+            User.ReportUsers.Add(reportUser);
+        }
+
+        private async Task DeleteReportUser(ReportModel report)
+        {
+            var reportUser = User.ReportUsers.First(x => x.ReportId == report.Id);
+            await HttpClient.DeleteAsync($"api/reports/users/{reportUser.Id}");
+            User.ReportUsers.Remove(reportUser);
         }
     }
 }
