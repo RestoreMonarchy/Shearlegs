@@ -77,7 +77,8 @@ namespace Shearlegs.Web.Server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetReportsAsync()
         {
-            return Ok(await reportsRepository.GetReportsAsync());
+            int userId = User.IsInRole(RoleConstants.AdminRoleId) ? 0 : int.Parse(User.Identity.Name);
+            return Ok(await reportsRepository.GetReportsAsync(userId));
         }
 
         [Authorize(Roles = RoleConstants.AdminRoleId)]
@@ -100,14 +101,27 @@ namespace Shearlegs.Web.Server.Controllers
         [HttpGet("{reportId}")]
         public async Task<IActionResult> GetReportAsync(int reportId)
         {
+            if (!User.IsInRole(RoleConstants.AdminRoleId)
+                && !await reportsRepository.HasPermissionAsync(int.Parse(User.Identity.Name), reportId))
+            {
+                return Unauthorized();
+            }
+
             return Ok(await reportsRepository.GetReportAsync(reportId));
         }
 
-        [Authorize(Roles = RoleConstants.AdminRoleId)]
+        [Authorize]
         [HttpGet("branches/{branchId}")]
         public async Task<IActionResult> GetReportBranchAsync(int branchId)
         {
-            return Ok(await reportsRepository.GetReportBranchAsync(branchId));
+            var branch = await reportsRepository.GetReportBranchAsync(branchId);
+            if (!User.IsInRole(RoleConstants.AdminRoleId)
+                && !await reportsRepository.HasPermissionAsync(int.Parse(User.Identity.Name), branch.ReportId))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(branch);
         }
 
         [Authorize(Roles = RoleConstants.AdminRoleId)]
@@ -138,7 +152,7 @@ namespace Shearlegs.Web.Server.Controllers
         public async Task<IActionResult> GetReportArchiveAsync(int id)
         {
             var reportArchive = await reportsRepository.GetReportArchiveAsync(id);
-            
+
             return File(reportArchive.Content, reportArchive.MimeType, reportArchive.Name);
         }
 
@@ -147,6 +161,12 @@ namespace Shearlegs.Web.Server.Controllers
         public async Task<IActionResult> PostAsync(int branchId)
         {
             var branchModel = await reportsRepository.GetReportPluginAsync(branchId);
+
+            if (!User.IsInRole(RoleConstants.AdminRoleId) 
+                && !await reportsRepository.HasPermissionAsync(int.Parse(User.Identity.Name), branchModel.ReportId))
+            {
+                return Unauthorized();
+            }
             
             string requestBody;
             using (var reader = new StreamReader(Request.Body))

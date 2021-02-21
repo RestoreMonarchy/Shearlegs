@@ -26,21 +26,3 @@
         </tbody>
     </table>
 }
-
-
-@code {
-    [Inject]
-    public HttpClient HttpClient { get; set; }
-    [Inject]
-    public NavigationManager NavigationManager { get; set; }
-
-    public List<ReportModel> Reports { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        Reports = await HttpClient.GetFromJsonAsync<List<ReportModel>>("api/reports");
-    }
-
-    private void GoToGenerateReport(ReportModel report) => NavigationManager.NavigateTo($"/reports/{report.Id}/generate");
-
-}

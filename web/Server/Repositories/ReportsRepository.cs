@@ -17,6 +17,12 @@ namespace Shearlegs.Web.Server.Repositories
             this.connection = connection;
         }
 
+        public async Task<bool> HasPermissionAsync(int userId, int reportId)
+        {
+            const string sql = "SELECT Count(0) FROM dbo.ReportUsers WHERE UserId = @userId AND ReportId = @reportId;";
+            return await connection.ExecuteScalarAsync<bool>(sql, new { userId, reportId });
+        }
+
         public async Task<ReportUserModel> AddReportUserAsync(ReportUserModel reportUser)
         {
             const string sql = "INSERT INTO dbo.ReportUsers (ReportId, UserId, AdminId) " +
@@ -149,9 +155,15 @@ namespace Shearlegs.Web.Server.Repositories
             await connection.ExecuteAsync(sql, new { secretId });
         }
 
-        public async Task<IEnumerable<ReportModel>> GetReportsAsync()
+        public async Task<IEnumerable<ReportModel>> GetReportsAsync(int userId)
         {
-            const string sql = "SELECT r.*, b.* FROM dbo.Reports r LEFT JOIN dbo.ReportBranches b ON r.Id = b.ReportId;";
+            string sql = "SELECT r.*, b.* FROM dbo.Reports r " +
+                "LEFT JOIN dbo.ReportBranches b ON r.Id = b.ReportId";
+
+            if (userId != 0 )
+            {
+                sql += " WHERE EXISTS (SELECT * FROM dbo.ReportUsers ru WHERE ru.ReportId = r.Id AND ru.UserId = @userId)";
+            }
 
             List<ReportModel> reports = new List<ReportModel>();
 
@@ -169,7 +181,7 @@ namespace Shearlegs.Web.Server.Repositories
                     report.Branches.Add(b);
 
                 return null;
-            });
+            }, new { userId });
 
             return reports;
         }
