@@ -4,7 +4,7 @@
     <div class="modal-dialog @modalSizeClass">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">@ModalName</h5>
+                <h5 class="modal-title">@Title</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             @if (Model != null)
@@ -44,6 +44,14 @@
 
     [Parameter]
     public EModalSize ModalSize { get; set; }
+
+    [Parameter]
+    public string CreateTitle { get; set; }
+
+    [Parameter]
+    public string UpdateTitle { get; set; }
+
+    private string Title => IsUpdate ? UpdateTitle : CreateTitle;
 
     public bool IsUpdate { get; private set; }
 

@@ -169,9 +169,8 @@
     </div>
     
 
-    
-
-    <Modal @ref="Modal" T="ReportBranchModel" ModalSize="EModalSize.Large" ModelFactory="() => new ReportBranchModel() { ReportId = ReportId }" OnCreated="PostReportBranchAsync" OnUpdated="PutReportBranchAsync">
+    <Modal @ref="Modal" T="ReportBranchModel" ModalSize="EModalSize.Large" ModelFactory="() => new ReportBranchModel() { ReportId = ReportId }" 
+           OnCreated="PostReportBranchAsync" OnUpdated="PutReportBranchAsync" CreateTitle="Create Branch" UpdateTitle="Edit Branch">
         @if (Modal != null && Modal.Model != null)
         {
             <div class="mb-3">

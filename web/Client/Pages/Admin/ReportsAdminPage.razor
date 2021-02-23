@@ -58,7 +58,8 @@ else
     <ProgressBar />
 }
 
-<Modal @ref="Modal" T="ReportModel" ModalSize="EModalSize.Large" ModelFactory="() => new ReportModel()" OnCreated="PostReportAsync" OnUpdated="PutReportAsync">
+<Modal @ref="Modal" T="ReportModel" ModalSize="EModalSize.Large" ModelFactory="() => new ReportModel()" OnCreated="PostReportAsync" OnUpdated="PutReportAsync"
+       CreateTitle="Create Report" UpdateTitle="Edit Report">
     @if (Modal != null && Modal.Model != null)
     {
         <div class="mb-3">
@@ -75,7 +76,5 @@ else
                 Enabled
             </label>
         </div>
-
-
     }
 </Modal>

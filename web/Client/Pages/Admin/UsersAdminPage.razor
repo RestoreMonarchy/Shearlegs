@@ -2,7 +2,20 @@
 
 @if (Users != null)
 {
-    <a class="btn btn-primary" href="/admin/users/add">Add User</a>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">Admin</li>
+        <li class="breadcrumb-item active">Users</li>
+    </ol>
+
+    <div class="d-flex align-items-center">
+        <div>
+            <h5>All Users</h5>
+        </div>
+        <div class="ms-auto">
+            <a class="btn btn-primary" href="/admin/users/add">Add User</a>
+        </div>
+    </div>
+    
     <table class="table table-hover">
         <thead>
             <tr>

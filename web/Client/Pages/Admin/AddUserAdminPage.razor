@@ -1,5 +1,13 @@
 ﻿@page "/admin/users/add"
 
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">Admin</li>
+        <li class="breadcrumb-item"><a href="/admin/users">Users</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Add User</li>
+    </ol>
+</nav>
+
 <div class="p-3 bg-light">
     <h4>Add New User</h4>
     <UserFormComponent User="new UserModel() { Role = RoleConstants.DefaultRoleId }" OnSubmit="AddUserAsync" />
