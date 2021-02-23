@@ -164,11 +164,12 @@ namespace Shearlegs.Web.Server.Repositories
         public async Task<IEnumerable<ReportModel>> GetReportsAsync(int userId)
         {
             string sql = "SELECT r.*, b.* FROM dbo.Reports r " +
-                "LEFT JOIN dbo.ReportBranches b ON r.Id = b.ReportId";
+                "LEFT JOIN dbo.ReportBranches b ON r.Id = b.ReportId " + 
+                "WHERE Enabled = 1";
 
             if (userId != 0 )
             {
-                sql += " WHERE EXISTS (SELECT * FROM dbo.ReportUsers ru WHERE ru.ReportId = r.Id AND ru.UserId = @userId)";
+                sql += " AND EXISTS (SELECT * FROM dbo.ReportUsers ru WHERE ru.ReportId = r.Id AND ru.UserId = @userId)";
             }
 
             List<ReportModel> reports = new List<ReportModel>();
