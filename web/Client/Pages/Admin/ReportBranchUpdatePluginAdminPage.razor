@@ -39,7 +39,16 @@
                 <li class="list-group-item disabled">Libraries</li>
                 @foreach (var library in PluginModel.Libraries)
                 {
-                    <li class="list-group-item">@library.Name</li>
+                    <li class="list-group-item d-flex align-items-center">
+                        <div>
+                            @library.Name
+                        </div>
+                        <div class="ms-auto">
+                            <a href="javascript:void(0)" class="btn btn-outline-danger" @onclick="() => RemoveLibrary(library)">
+                                <i class="bi bi-trash-fill"></i>
+                            </a>
+                        </div>
+                    </li>
                 }
             </ul>
 

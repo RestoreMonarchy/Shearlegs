@@ -67,5 +67,10 @@ namespace Shearlegs.Web.Client.Pages.Admin
 
             PluginModel = new ReportBranchPluginModel() { Libraries = new List<ReportBranchPluginLibraryModel>() };
         }
+
+        private void RemoveLibrary(ReportBranchPluginLibraryModel library)
+        {
+            PluginModel.Libraries.Remove(library);
+        } 
     }
 }
