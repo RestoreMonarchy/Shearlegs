@@ -2,8 +2,21 @@
 
 @if (Reports != null)
 {
-    <div class="mt-5">
-        <button class="btn btn-primary btn-lg" @onclick="AddReportAsync">Add</button>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">Admin</li>
+            <li class="breadcrumb-item active" aria-current="page">Reports</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex align-items-center">
+        <div>
+            <h5>All Reports</h5>
+        </div>
+        <div class="ms-auto">
+            <button class="btn btn-primary" @onclick="AddReportAsync">Add New Report</button>
+        </div>
+        
     </div>
 
     <table class="table">
@@ -39,7 +52,8 @@
             }
         </tbody>
     </table>
-} else
+}
+else
 {
     <ProgressBar />
 }
@@ -62,6 +76,6 @@
             </label>
         </div>
 
-       
+
     }
 </Modal>
