@@ -72,4 +72,7 @@
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Shearlegs.Web.Database.publish.xml" />
+  </ItemGroup>
 </Project>

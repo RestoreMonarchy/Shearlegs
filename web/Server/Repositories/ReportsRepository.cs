@@ -41,16 +41,22 @@ namespace Shearlegs.Web.Server.Repositories
 
         public async Task<ReportArchiveModel> ArchiveReportAsync(ReportArchiveModel report)
         {
-            const string sql = "INSERT INTO dbo.ReportsArchive (Name, MimeType, Content, PluginName, Parameters) " +
-                "OUTPUT INSERTED.Id, INSERTED.Name, INSERTED.MimeType, INSERTED.PluginName, INSERTED.Parameters, " +
-                "INSERTED.CreateDate VALUES (@Name, @MimeType, @Content, @PluginName, @Parameters);";
+            const string sql = "INSERT INTO dbo.ReportsArchive (PluginId, Name, MimeType, Content, Parameters) " +
+                "OUTPUT INSERTED.Id, INSERTED.PluginId, INSERTED.Name, INSERTED.MimeType, INSERTED.Parameters, " +
+                "INSERTED.CreateDate VALUES (@PluginId, @Name, @MimeType, @Content, @Parameters);";
             return await connection.QuerySingleAsync<ReportArchiveModel>(sql, report);
         }
 
         public async Task<ReportArchiveModel> GetReportArchiveAsync(int id)
         {
-            const string sql = "SELECT * FROM dbo.ReportsArchive WHERE Id = @id;";
-            return await connection.QuerySingleOrDefaultAsync<ReportArchiveModel>(sql, new { id });
+            const string sql = "SELECT a.*, p.Id, p.Version, p.CreateDate, r.* FROM dbo.ReportsArchive a JOIN dbo.ReportBranchPlugins p ON p.Id = a.PluginId " +
+                "JOIN dbo.ReportBranches b ON b.Id = p.BranchId JOIN dbo.Reports r ON b.ReportId = r.Id WHERE a.Id = @id;";
+            return (await connection.QueryAsync<ReportArchiveModel, ReportBranchPluginModel, ReportModel, ReportArchiveModel>(sql, (a, p, r) => 
+            {
+                a.Report = r;
+                a.Plugin = p;
+                return a;
+            }, new { id })).FirstOrDefault();
         }
 
         public async Task UpdateReportBranchAsync(ReportBranchModel branch)

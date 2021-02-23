@@ -216,7 +216,7 @@ namespace Shearlegs.Web.Server.Controllers
                 Name = result.ReportFile.Name,
                 Content = result.ReportFile.Data,
                 MimeType = result.ReportFile.MimeType,
-                PluginName = result.ReportFile.Name,
+                PluginId = branchModel.Plugin.Id,
                 Parameters = requestBody
             };
 

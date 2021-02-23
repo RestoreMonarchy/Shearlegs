@@ -32,6 +32,7 @@ namespace Shearlegs.Web.Client.Pages.Admin
         private async Task UpdateUserAsync(UserModel user)
         {
             await HttpClient.PutAsJsonAsync("api/users", user);
+            user.Password = string.Empty;
         }
 
         private async Task AddReportUser(ReportModel report)

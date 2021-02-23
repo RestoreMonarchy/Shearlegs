@@ -30,6 +30,13 @@ namespace Shearlegs.Web.Server.Repositories
         {
             const string sql = "UPDATE dbo.Users SET Role = @Role WHERE Id = @Id;";
             await connection.ExecuteAsync(sql, user);
+
+            if (!string.IsNullOrEmpty(user.Password))
+            {
+                const string sql1 = "UPDATE dbo.Users SET PasswordHash = HASHBYTES('SHA2_512', @Password) WHERE Id = @Id;";
+                await connection.ExecuteAsync(sql1, user);
+            }
+            
         }
 
         public async Task<UserModel> GetUserAsync(int id)
