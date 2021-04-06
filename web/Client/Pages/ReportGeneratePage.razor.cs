@@ -29,14 +29,13 @@ namespace Shearlegs.Web.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            Console.WriteLine(ReportId);
             Report = await HttpClient.GetFromJsonAsync<ReportModel>("api/reports/" + ReportId);
             await ReloadBranchAsync(Report.Branches.FirstOrDefault()?.Id ?? 0);
         }
 
         private async Task OnChangeBranchAsync(ChangeEventArgs e)
         {
-            await ReloadBranchAsync((int)e.Value);
+            await ReloadBranchAsync(int.Parse(e.Value.ToString()));
         }
 
         private async Task ReloadBranchAsync(int branchId)
